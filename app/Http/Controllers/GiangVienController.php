@@ -2,64 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\GiangVien;
 use Illuminate\Http\Request;
 
 class GiangVienController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return response()->json(GiangVien::all());
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function show($id) { return GiangVien::findOrFail($id); }
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'ho'=>'required|string',
+            'ten'=>'required|string',
+            'email'=>'required|email|unique:giang_viens,email',
+        ]);
+        return GiangVien::create($data);
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(GiangVien $giangVien)
+    public function update(Request $request, $id)
     {
-        //
+        $gv = GiangVien::findOrFail($id);
+        $data = $request->validate([
+            'ho'=>'sometimes|string',
+            'ten'=>'sometimes|string',
+            'email'=>'sometimes|email|unique:giang_viens,email,'.$id,
+        ]);
+        $gv->update($data);
+        return $gv;
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(GiangVien $giangVien)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, GiangVien $giangVien)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(GiangVien $giangVien)
-    {
-        //
+        GiangVien::findOrFail($id)->delete();
+        return response()->json(['message'=>'Đã xóa giảng viên']);
     }
 }

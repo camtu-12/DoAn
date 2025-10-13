@@ -3,46 +3,48 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\PhanCongGiamThi;
+use App\Models\LichThi;
 use Illuminate\Http\Request;
 
-class PhanCongGiamThiController extends Controller
+class LichThiController extends Controller
 {
     public function index()
     {
-        return response()->json(PhanCongGiamThi::all());
+        return response()->json(LichThi::all());
     }
 
     public function show($id)
     {
-        return PhanCongGiamThi::with('giangvien','phongthi','lichthi')->findOrFail($id);
+        return LichThi::with('sinhvien','giangvien','phongthi')->findOrFail($id);
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
+            'sinh_vien_id'=>'required|exists:sinh_viens,id',
             'giang_vien_id'=>'required|exists:giang_viens,id',
             'phong_thi_id'=>'required|exists:phong_this,id',
-            'lich_thi_id'=>'required|exists:lich_this,id',
+            'ngay_gio'=>'required|date',
         ]);
-        return PhanCongGiamThi::create($data);
+        return LichThi::create($data);
     }
 
     public function update(Request $request,$id)
     {
-        $pc = PhanCongGiamThi::findOrFail($id);
+        $lt = LichThi::findOrFail($id);
         $data = $request->validate([
+            'sinh_vien_id'=>'sometimes|exists:sinh_viens,id',
             'giang_vien_id'=>'sometimes|exists:giang_viens,id',
             'phong_thi_id'=>'sometimes|exists:phong_this,id',
-            'lich_thi_id'=>'sometimes|exists:lich_this,id',
+            'ngay_gio'=>'sometimes|date',
         ]);
-        $pc->update($data);
-        return $pc;
+        $lt->update($data);
+        return $lt;
     }
 
     public function destroy($id)
     {
-        PhanCongGiamThi::findOrFail($id)->delete();
-        return response()->json(['message'=>'Đã xóa phân công giám thị']);
+        LichThi::findOrFail($id)->delete();
+        return response()->json(['message'=>'Đã xóa lịch thi']);
     }
 }

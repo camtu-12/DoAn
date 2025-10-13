@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LinhThi;
+use App\Models\admin;
 use Illuminate\Http\Request;
 
-class LinhThiController extends Controller
+class AdminController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -34,7 +34,7 @@ class LinhThiController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(LinhThi $linhThi)
+    public function show(admin $admin)
     {
         //
     }
@@ -42,7 +42,7 @@ class LinhThiController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(LinhThi $linhThi)
+    public function edit(admin $admin)
     {
         //
     }
@@ -50,7 +50,7 @@ class LinhThiController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, LinhThi $linhThi)
+    public function update(Request $request, admin $admin)
     {
         //
     }
@@ -58,7 +58,7 @@ class LinhThiController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(LinhThi $linhThi)
+    public function destroy(admin $admin)
     {
         //
     }

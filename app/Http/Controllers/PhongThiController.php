@@ -2,64 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\PhongThi;
 use Illuminate\Http\Request;
 
 class PhongThiController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return response()->json(PhongThi::all());
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function show($id) { return PhongThi::findOrFail($id); }
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'ten_phong'=>'required|string',
+            'suc_chua'=>'required|integer',
+        ]);
+        return PhongThi::create($data);
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(PhongThi $phongThi)
+    public function update(Request $request,$id)
     {
-        //
+        $pt = PhongThi::findOrFail($id);
+        $data = $request->validate([
+            'ten_phong'=>'sometimes|string',
+            'suc_chua'=>'sometimes|integer',
+        ]);
+        $pt->update($data);
+        return $pt;
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PhongThi $phongThi)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, PhongThi $phongThi)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PhongThi $phongThi)
-    {
-        //
+        PhongThi::findOrFail($id)->delete();
+        return response()->json(['message'=>'Đã xóa phòng thi']);
     }
 }
+

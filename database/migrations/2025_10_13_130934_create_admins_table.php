@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('phong_this', function (Blueprint $table) {
+        Schema::create('admins', function (Blueprint $table) {
             $table->id();
+            $table->string('Ho', 120);
+            $table->string('Ten', 120);
+            $table->string('Email')->unique();
+            $table->string('Sdt')->nullable();
+            $table->date('Ngay_Sinh')->nullable();
             $table->timestamps();
         });
     }
@@ -22,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('phong_this');
+        Schema::dropIfExists('admins');
     }
 };

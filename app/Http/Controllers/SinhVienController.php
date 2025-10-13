@@ -8,59 +8,54 @@ use Illuminate\Http\Request;
 
 class SinhVienController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // GET /api/sinhviens
     public function index()
     {
-        return SinhVien::all();
+        return response()->json(SinhVien::all());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // GET /api/sinhviens/{id}
+    public function show($id)
     {
-        //
+        return SinhVien::findOrFail($id); // Trả về 1 sinh viên
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // POST /api/sinhviens
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'ho' => 'required|string',
+            'ten' => 'required|string',
+            'mssv' => 'required|string|unique:sinh_viens,mssv',
+            'lop' => 'required|string',
+        ]);
+
+        return SinhVien::create($data);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(SinhVien $sinhVien)
+    // PUT /api/sinhviens/{id}
+    public function update(Request $request, $id)
     {
-        //
+        $sv = SinhVien::findOrFail($id);
+
+        $data = $request->validate([
+            'ho' => 'sometimes|string',
+            'ten' => 'sometimes|string',
+            'mssv' => 'sometimes|string|unique:sinh_viens,mssv,'.$id,
+            'lop' => 'sometimes|string',
+        ]);
+
+        $sv->update($data);
+
+        return $sv;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(SinhVien $sinhVien)
+    // DELETE /api/sinhviens/{id}
+    public function destroy($id)
     {
-        //
-    }
+        $sv = SinhVien::findOrFail($id);
+        $sv->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, SinhVien $sinhVien)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(SinhVien $sinhVien)
-    {
-        //
+        return response()->json(['message' => 'Đã xóa sinh viên']);
     }
 }

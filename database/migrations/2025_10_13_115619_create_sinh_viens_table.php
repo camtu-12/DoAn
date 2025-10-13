@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('sinh_viens', function (Blueprint $table) {
             $table->id();
+            $table->string('Ho', 120);
+            $table->string('Ten', 120);
+            $table->string('Email',191)->unique();; 
+            $table->date('Ngay_Sinh')->nullable();
+            $table->string('Mssv')->unique();
+            $table->string('Lop');
+            $table->string('Khoa');
+            $table->string('Photo')->nullable();
             $table->timestamps();
         });
     }

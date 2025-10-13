@@ -1,12 +1,24 @@
 <?php
-
-use App\Http\Controllers\ProfileController;
+use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\HocSinhController;
-use App\Http\Controllers\GiangVienController;
+use Illuminate\Support\Facades\Auth;    
+//Đây là của P thêm   
+use Illuminate\Http\Request;
 
+
+// Import các controller
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SinhVienController;
+use App\Http\Controllers\GiangVienController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PhongThiController;
+use App\Http\Controllers\LichThiController;
+use App\Http\Controllers\PhanCongGiamThiController;
+use App\Models\GiangVien;
+
+// Trang chủ
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -16,9 +28,42 @@ Route::get('/', function () {
     ]);
 });
 
+// Dashboard — tự động chuyển trang Vue theo vai trò
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    /** @var User|null $user */
+    $user = Auth::user();
+
+    if (!$user) {
+        return redirect()->route('login');
+    }
+
+    switch ($user->role) {
+        case 'Admin':
+            return Inertia::render('Admin/Index', ['user' => $user]);
+        case 'GiangVien':
+            return Inertia::render('GiangVien/Index', ['user' => $user]);
+        case 'SinhVien':
+            return Inertia::render('SinhVien/Index', ['user' => $user]);
+        default:
+            return Inertia::render('SinhVien/Index', ['user' => $user]);
+    }
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+//Logout route (P)
+Route::post('/logout', function (Request $request) {
+    Auth::logout(); // Đăng xuất user
+
+    // Xóa session & regenerate token
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    // Quay về trang login
+    return redirect()->route('login');
+})->name('logout');
+
+Route::resource('sinhviens', SinhVienController::class)->middleware(['auth', 'verified']);
+Route::resource('giangviens', GiangVienController::class)->middleware(['auth', 'verified']);
+Route::resource('admin', AdminController::class)->middleware(['auth', 'verified']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -26,13 +71,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/webcam', function() {
-    return view('webcam');
-});
-
 require __DIR__.'/auth.php';
-
-
-Route::resource('giangvien', GiangVienController::class);
-Route::resource('hocsinh', HocSinhController::class);
-

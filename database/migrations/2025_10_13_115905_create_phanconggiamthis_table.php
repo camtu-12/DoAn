@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('phanconggiamthis', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('exam_id')->constrained('lich_thi')->onDelete('cascade');
+            $table->foreignId('exam_id')->constrained('lich_this')->onDelete('cascade');
             $table->foreignId('teacher_id')->constrained('giang_viens')->onDelete('cascade');
+            $table->foreignId('phong_thi_id')->constrained('phong_this');
             $table->string('role')->default('giám thị'); // ví dụ: giám thị, trưởng phòng
             $table->timestamps();
             $table->unique(['exam_id','teacher_id']);

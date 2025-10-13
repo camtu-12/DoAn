@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
-use App\Models\LichThi;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\GiangVien;
 use App\Models\PhongThi;
+use App\Models\SinhVien;
 
-class PhanCongGiamThi extends Model
+class LichThi extends Model
 {
      use HasFactory;
-    protected $fillable = ['exam_id','teacher_id','phong_thi_id','role'];
+    protected $fillable = ['Mon_Thi', 'Ngay_Thi', 'Gio_Bat_Dau', 'Gio_Ket_Thuc', 'So_Phong','Ghi_Chu'];
 
+    public function sinhvien() { return $this->belongsTo(SinhVien::class); }
     public function giangvien() { return $this->belongsTo(GiangVien::class); }
     public function phongthi() { return $this->belongsTo(PhongThi::class); }
-    public function lichthi() { return $this->belongsTo(LichThi::class); }
 }
