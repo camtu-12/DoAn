@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('giang_viens', function (Blueprint $table) {
             $table->string('Ho', 120);
             $table->string('Ten', 120);
-            $table->string('email')->unique()->nullable(); 
-            $table->string('sdt')->nullable();
-            $table->string('Bo mon')->nullable();
+            $table->string('Email')->unique()->nullable(); 
+            $table->string('Sdt')->nullable();
+            $table->string('Bo_Mon')->nullable();
             $table->timestamps();
         });
     }

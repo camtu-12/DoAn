@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('hoc_sinhs', function (Blueprint $table) {
+        Schema::create('sinh_viens', function (Blueprint $table) {
             $table->id();
             $table->string('Ho', 120);
             $table->string('Ten', 120);
-            $table->string('email')->unique();; 
+            $table->string('Email')->unique();; 
             $table->date('Ngay_Sinh')->nullable();
-            $table->string('mssv')->unique();
+            $table->string('Mssv')->unique();
             $table->string('Lop');
             $table->string('Khoa');
-            $table->string('photo')->nullable();
+            $table->string('Photo')->nullable();
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hoc_sinhs');
+        Schema::dropIfExists('sinh_viens');
     }
 };

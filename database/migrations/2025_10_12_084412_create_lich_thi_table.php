@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('lich_thi', function (Blueprint $table) {
+        Schema::create('lich_this', function (Blueprint $table) {
             $table->id();
-            $table->string('Mon hoc');
-            $table->date('Ngay thi');
-            $table->time('Gio bat dau');
-            $table->time('Gio ket thuc');
-            $table->foreignId('So Phong')->nullable()->constrained('phong_thi')->nullOnDelete();
-            $table->string('Ghi chu')->nullable();
+            $table->string('Mon_Hoc');
+            $table->date('Ngay_Thi');
+            $table->time('Gio_Bat_Dau');
+            $table->time('Gio_Ket_Thuc');
+            $table->foreignId('So_Phong')->nullable()->constrained('phong_this')->nullOnDelete();
+            $table->string('Ghi_Chu')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('lich_thi');
+        Schema::dropIfExists('lich_this');
     }
 };
