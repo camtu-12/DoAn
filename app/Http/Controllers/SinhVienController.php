@@ -39,8 +39,7 @@ class SinhVienController extends Controller
         $sv = SinhVien::findOrFail($id);
 
         $data = $request->validate([
-            'ho' => 'sometimes|string',
-            'ten' => 'sometimes|string',
+            'hovaten' => 'sometimes|string',
             'mssv' => 'sometimes|string|unique:sinh_viens,mssv,'.$id,
             'lop' => 'sometimes|string',
         ]);
