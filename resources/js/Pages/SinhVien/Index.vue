@@ -5,7 +5,7 @@
       <div class="brand">
         <div class="logo">SV</div>
         <div class="brand-text">
-          <h1 class="title">Cổng thông tin sinh viên</h1>
+          <h1 class="title">Cổng thông tin sinh viên xinh</h1>
           <p class="lead">KHOA CÔNG NGHỆ THÔNG TIN</p>
         </div>
       </div>
