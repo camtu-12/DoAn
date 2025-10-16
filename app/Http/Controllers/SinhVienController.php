@@ -57,4 +57,43 @@ class SinhVienController extends Controller
 
         return response()->json(['message' => 'Đã xóa sinh viên']);
     }
+// use App\Models\SinhVien; use App\Models\User;
+
+public function info(Request $request)
+{
+    $user = $request->user();
+
+    $sinhvien = \App\Models\SinhVien::where('Email', $user->email)->first();
+
+    if (!$sinhvien) {
+        return response()->json(['message' => 'Không tìm thấy sinh viên'], 404);
+    }
+
+    return response()->json([
+        'ho' => $sinhvien->Ho,
+        'ten' => $sinhvien->Ten,
+        'email' => $sinhvien->Email,
+        'ngay_sinh' => $sinhvien->Ngay_Sinh,
+        'mssv' => $sinhvien->Mssv,
+        'lop' => $sinhvien->Lop,
+        'khoa' => $sinhvien->Khoa,
+        'photo' => $sinhvien->Photo,
+    ]);
+}
+
+
+public function attendance() {
+    return response()->json([
+        ['monhoc' => 'Lập trình Web', 'trangthai' => 'Có mặt'],
+        ['monhoc' => 'CSDL', 'trangthai' => 'Vắng'],
+    ]);
+}
+
+public function examSchedule() {
+    return response()->json([
+        ['monhoc' => 'Lập trình Web', 'ngay' => '2025-10-25', 'phong' => 'B201'],
+        ['monhoc' => 'CSDL', 'ngay' => '2025-10-30', 'phong' => 'C103'],
+    ]);
+}
+
 }

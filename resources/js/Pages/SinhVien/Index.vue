@@ -35,22 +35,22 @@
 
         <form @submit.prevent="updateProfile">
           <label>Họ và tên:</label>
-          <input type="text" v-model="student.name" required />
+          <input type="text" v-model="name" required />
 
           <label>Email:</label>
           <input type="email" v-model="student.email" required />
 
           <label>Ngày sinh:</label>
-          <input type="date" v-model="student.birthdate" required />
+          <input type="date" v-model="student.ngay_sinh" required />
 
           <label>MSSV:</label>
-          <input type="text" v-model="student.student_code" required />
+          <input type="text" v-model="student.mssv" required />
 
           <label>Lớp:</label>
-          <input type="text" v-model="student.class" required />
+          <input type="text" v-model="student.lop" required />
 
           <label>Khoa:</label>
-          <select v-model="student.major" required>
+          <select v-model="student.khoa" required>
             <option disabled value="">-- Chọn khoa --</option>
             <option>Công Nghệ Thông Tin</option>
             <option>Quản Trị Kinh Doanh</option>
@@ -61,15 +61,12 @@
             <option>Luật Kinh Tế</option>
           </select>
 
-
           <img :src="student.photo_url" alt="Ảnh sinh viên" class="avatar-img" />
 
           <button type="submit" class="update-btn">Cập nhật thông tin</button>
         </form>
-
         <p v-if="profileMessage">{{ profileMessage }}</p>
       </section>
-
 
       <!-- Kết quả điểm danh -->
       <section v-if="currentTab === 'attendance'" class="section">
@@ -86,7 +83,7 @@
 
       <!-- Lịch thi & Phòng thi -->
       <section v-if="currentTab === 'exam'" class="section">
-        <p class="Tieude">Lịch thi & Phòng thi</p> 
+        <p class="Tieude">Lịch thi & Phòng thi</p>
         <ul>
           <li v-for="exam in exams" :key="exam.id">
             <strong>{{ exam.subject }}</strong> - {{ exam.date }} - Phòng: {{ exam.room }}
@@ -112,65 +109,96 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'StudentDashboard',
-  data() {
-    return {
-      currentTab: 'info',
-      student: {},
-      attendance: [],
-      exams: [],
-      password: {
-        old: '',
-        new: '',
-        confirm: '',
-      },
-      passwordMessage: '',
-    };
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import axios from 'axios'
+import { router } from '@inertiajs/vue3'
+// 🧠 Reactive state (thay cho data())
+const currentTab = ref('info')
+const student = ref({
+  ho: '',
+  ten: '',
+  email: '',
+  ngay_sinh: '',
+  mssv: '',
+  lop: '',
+  khoa: '',
+  photo: ''
+})
+const attendance = ref([])
+const exams = ref([])
+const password = ref({ old: '', new: '', confirm: '' })
+const passwordMessage = ref('')
+const profileMessage = ref('')
+
+
+// Computed property to combine and split name
+const name = computed({
+  get() {
+    return `${student.value.ho} ${student.value.ten}`.trim()
   },
-  created() {
-    this.fetchStudentInfo();
-    this.fetchAttendance();
-    this.fetchExamSchedule();
-  },
-  methods: {
-    async fetchStudentInfo() {
-      const res = await this.$axios.get('/api/sinhvien/thongtin');
-      this.student = res.data;
-    },
-    async fetchAttendance() {
-      const res = await this.$axios.get('/api/sinhvien/diemdanh');
-      this.attendance = res.data;
-    },
-    async fetchExamSchedule() {
-      const res = await this.$axios.get('/api/sinhvien/lichthi');
-      this.exams = res.data;
-    },
-    async changePassword() {
-      if (this.password.new !== this.password.confirm) {
-        this.passwordMessage = '❌ Mật khẩu xác nhận không khớp.';
-        return;
-      }
-      try {
-        await this.$axios.post('/api/sinhvien/doimatkhau', this.password);
-        this.passwordMessage = '✅ Đổi mật khẩu thành công.';
-        this.password = { old: '', new: '', confirm: '' };
-      } catch {
-        this.passwordMessage = '❌ Đổi mật khẩu thất bại.';
-      }
-    },
-    logout() {
-      this.$axios.post('/api/logout').then(() => {
-        this.$router.push('/login');
-      });
-    },
-  },
-};
+  set(value) {
+    // Split the full name when edited
+    const parts = value.split(' ')
+    student.value.ten = parts.pop() // last word = ten
+    student.value.ho = parts.join(' ') // rest = ho
+  }
+})
+// 🧩 Hàm logout
+function logout() {
+  router.post(route('logout'))
+}
+
+// 🧩 Gọi API
+async function fetchStudentInfo() {
+  const res = await axios.get('/sinhvien/thongtin')
+  student.value = res.data
+}
+
+async function fetchAttendance() {
+  const res = await axios.get('/sinhvien/diemdanh')
+  attendance.value = res.data
+}
+
+async function fetchExamSchedule() {
+  const res = await axios.get('/sinhvien/lichthi')
+  exams.value = res.data
+}
+
+async function changePassword() {
+  if (password.value.new !== password.value.confirm) {
+    passwordMessage.value = '❌ Mật khẩu xác nhận không khớp.'
+    return
+  }
+  try {
+    await axios.post('/sinhvien/doimatkhau', password.value)
+    passwordMessage.value = '✅ Đổi mật khẩu thành công.'
+    password.value = { old: '', new: '', confirm: '' }
+  } catch {
+    passwordMessage.value = '❌ Đổi mật khẩu thất bại.'
+  }
+}
+
+async function updateProfile() {
+  try {
+    await axios.post('/sinhvien/update', student.value)
+    profileMessage.value = '✅ Cập nhật thông tin thành công.'
+  } catch {
+    profileMessage.value = '❌ Cập nhật thất bại.'
+  }
+}
+
+// 🧩 Khi component load
+onMounted(() => {
+  fetchStudentInfo()
+  fetchAttendance()
+  fetchExamSchedule()
+})
 </script>
 
 <style scoped>
-.Tieude{
+/* (Giữ nguyên toàn bộ CSS cũ của bạn) */
+.Tieude {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
@@ -233,7 +261,6 @@ export default {
 }
 .main-content {
   flex: 1;
-
   padding: 30px;
   background-color: #ecf0f1;
 }
@@ -274,12 +301,3 @@ form input {
   background-color: #1e8449;
 }
 </style>
-
-<script setup>
-import { router } from '@inertiajs/vue3'
-function logout() {   
-  router.post(route('logout'))
-}
-
-</script>
-

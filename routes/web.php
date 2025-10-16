@@ -73,4 +73,21 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
+// Các route danh sách
+Route::get('/sinhviens', [SinhVienController::class, 'index']);
+Route::get('/giangviens', [GiangVienController::class, 'index']);
+Route::get('/phongthis', [PhongThiController::class, 'index']);
+Route::get('/lichthis', [LichThiController::class, 'index']);
+Route::get('/phanconggiamthis', [PhanCongGiamThiController::class, 'index']);
+
+// ✅ Nhóm các route cho sinh viên
+Route::prefix('sinhvien')->group(function () {
+    // Route cần đăng nhập (nếu bạn dùng Sanctum)
+    Route::middleware('auth:sanctum')->get('/thongtin', [SinhVienController::class, 'info']);
+
+    // Route công khai (test tạm thời)
+    Route::get('/diemdanh', [SinhVienController::class, 'attendance']);
+    Route::get('/lichthi', [SinhVienController::class, 'examSchedule']);
+});
+
 
