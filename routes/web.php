@@ -17,6 +17,7 @@ use App\Http\Controllers\PhongThiController;
 use App\Http\Controllers\LichThiController;
 use App\Http\Controllers\PhanCongGiamThiController;
 use App\Models\GiangVien;
+use App\Models\SinhVien;
 
 // Trang chủ
 Route::get('/', function () {
@@ -139,4 +140,10 @@ Route::get('/schedules', [AdminController::class, 'getSchedules']); //lich thi p
 Route::post('/schedules/add', [AdminController::class, 'addSchedule']);
 Route::put('/schedules/update/{id}', [AdminController::class, 'updateSchedule']);
 Route::delete('/schedules/delete/{id}', [AdminController::class, 'deleteSchedule']);
+
+//chức năng thêm xóa sửa trong giảng viên
+Route::post('/lecturers/add', [GiangVienController::class, 'addLecturer']);
+Route::delete('/lecturers/delete/{id}', [GiangVienController::class, 'deleteLecturer']);
+Route::put('/lecturers/update/{id}', [GiangVienController::class, 'updateLecturer']);
+Route::put('/sinhviens/update/{id}', [SinhVienController::class, 'updateStudent']);
 

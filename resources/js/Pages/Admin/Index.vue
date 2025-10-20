@@ -137,7 +137,7 @@
                         <td>{{ l.Sdt }}</td>
                         <td class="actions-cell">
                           <button @click="openLecturerForm(l, i)">Sửa</button>
-                          <button @click="deleteLecturer(i)">Xóa</button>
+                          <button @click="deleteLecturer(l.MaGV)">Xóa</button>
                         </td>
                       </tr>
                       <tr v-if="lecturers.length === 0">
@@ -202,31 +202,35 @@
     </div>
 
     <!-- FORMS / MODALS -->
-    <div v-if="showLecturerModal" class="modal">
-      <div class="modal-card">
-        <h3>{{ lecturerEditingIndex === null ? 'Thêm giảng viên' : 'Sửa giảng viên' }}</h3>
-        <div class="form-row"><label>Mã giảng viên</label><input v-model="giangvien.MaGV" /></div>
-        <div class="form-row"><label>Họ tên</label><input v-model="giangvien.Ho_va_Ten" /></div>
-        <div class="form-row"><label>Email</label><input v-model="giangvien.Email" /></div>
-        <div class="form-row"><label>SĐT</label><input v-model="giangvien.Sdt" /></div>
-        <div class="form-row actions"><button @click="saveLecturer">Lưu</button><button @click="closeLecturerForm">Hủy</button></div>
-      </div>
-    </div>
+          <div v-if="showLecturerModal" class="modal">
+          <div class="modal-card">
+            <h3>{{ lecturerEditingIndex === null ? 'Thêm giảng viên' : 'Sửa giảng viên' }}</h3>
+            <div class="form-row">
+              <label>Mã giảng viên</label>
+              <input v-model="lecturerForm.MaGV" />
+            </div>
+            <div class="form-row">
+              <label>Họ tên</label>
+              <input v-model="lecturerForm.Ho_va_Ten" />
+            </div>
+            <div class="form-row">
+              <label>Email</label>
+              <input v-model="lecturerForm.Email" />
+            </div>
+            <div class="form-row">
+              <label>SĐT</label>
+              <input v-model="lecturerForm.Sdt" />
+            </div>
+            <div class="form-row actions">
+              <button @click="saveLecturer">Lưu</button>
+              <button @click="closeLecturerForm">Hủy</button>
+            </div>
+          </div>
+        </div>
 
-    <div v-if="showStudentModal" class="modal">
-      <div class="modal-card">
-        <h3>{{ studentEditingIndex === null ? 'Thêm sinh viên' : 'Sửa sinh viên' }}</h3>
-        <div class="form-row"><label>Họ tên</label><input v-model="sinhvien.ten" /></div>
-        <div class="form-row"><label>Email</label><input v-model="sinhvien.Email" /></div>
-        <div class="form-row"><label>Ngày sinh</label><input type="date" v-model="sinhvien.ngay_sinh" /></div>
-        <div class="form-row"><label>MSSV</label><input v-model="sinhvien.mssv" /></div>
-        <div class="form-row"><label>Lớp</label><input v-model="sinhvien.lop" /></div>
-        <div class="form-row"><label>Khoa</label><input v-model="sinhvien.khoa" /></div>
-        <div class="form-row"><label>Ảnh</label><input type="file" @change="onStudentPhoto" /></div>
-        <div class="form-row actions"><button @click="saveStudent">Lưu</button><button @click="closeStudentForm">Hủy</button></div>
-      </div>
-    </div>
+  
 
+    <!-- FORMS / MODALS -->
     <div v-if="showScheduleModal" class="modal">
       <div class="modal-card wide">
         <h3>{{ scheduleEditingIndex === null ? 'Thêm lịch thi' : 'Sửa lịch thi' }}</h3>
@@ -260,7 +264,7 @@
         <div class="form-row actions"><button @click="saveAttendance">Lưu</button><button @click="closeAttendanceForm">Hủy</button></div>
       </div>
     </div>
-
+    
   </div>
 </template>
 
@@ -338,14 +342,22 @@ const fetchSchedules = async () => {
 
 
 async function saveSchedule() {
-  try {
-    await axios.post('/schedules/add', scheduleForm);
-    // Refresh data from backend
-    await fetchSchedules();
-    // Close modal
-    showScheduleModal.value = false;
+   try {
+    if (scheduleEditingIndex.value === null) {
+      // ➕ Thêm mới
+      await axios.post('/schedules/add', scheduleForm);
+      alert('✅ Thêm lịch thi thành công!');
+    } else {
+      // ✏️ Cập nhật
+      await axios.put(`/schedules/update/${id}`, scheduleForm);
+      alert('✅ Cập nhật lịch thi thành công!');
+    }
+
+    await fetchLecturers();
+    closeLecturerForm();
   } catch (err) {
-    console.error('❌ Lỗi khi lưu lịch:', err.response?.data || err.message);
+    console.error('❌ Lỗi khi lưu lịch thi:', err.response?.data || err.message);
+    alert('❌ Không thể lưu lịch thi');
   }
 }
 
@@ -379,21 +391,52 @@ const filteredSchedules = computed(() => {
 // MODALS & FORM - Giảng viên
 // =============================
 const showLecturerModal = ref(false)
-const lecturerForm = reactive({ code: '', name: '', email: '', phone: '' })
+const lecturerForm = reactive({ MaGV: '', Ho_va_Ten: '', Email: '', Sdt: '' })
 const lecturerEditingIndex = ref(null)
 
 function openLecturerForm(item=null, idx=null){
-  if(item){ Object.assign(lecturerForm, item); lecturerEditingIndex.value = idx }
-  else { Object.assign(lecturerForm, {code:'',name:'',email:'',phone:''}); lecturerEditingIndex.value = null }
-  showLecturerModal.value = true
+  if(item){ 
+    Object.assign(lecturerForm, item); 
+    lecturerEditingIndex.value = idx }
+  else { 
+    Object.assign(lecturerForm, {
+      MaGV:'',
+      Ho_va_Ten:'',
+      Email:'',
+      Sdt:''});
+       lecturerEditingIndex.value = null;
+      }
+  showLecturerModal.value = true;
 }
 function closeLecturerForm(){ showLecturerModal.value = false }
-function saveLecturer(){
-  if(lecturerEditingIndex.value===null){ lecturers.value.push({...lecturerForm}) }
-  else { lecturers.value[lecturerEditingIndex.value] = {...lecturerForm} }
-  closeLecturerForm()
+async function saveLecturer() {
+  try {
+  if (lecturerEditingIndex.value === null) {
+      // ➕ Thêm mới
+      await axios.post('/lecturers/add', lecturerForm);
+      alert('✅ Thêm giảng viên thành công!');
+    } else {
+      // ✏️ Cập nhật
+      await axios.put(`/lecturers/update/${lecturerForm.MaGV}`, lecturerForm);
+      alert('✅ Cập nhật giảng viên thành công!');
+    }
+
+    await fetchLecturers();
+    closeLecturerForm();
+  } catch (err) {
+    console.error('❌ Lỗi khi lưu giảng viên:', err.response?.data || err.message);
+    alert('❌ Không thể lưu giảng viên. Xem console để biết thêm chi tiết.');
+  }
 }
-function deleteLecturer(i){ if(confirm('Xóa giảng viên này?')) lecturers.value.splice(i,1) }
+async function deleteLecturer(id){
+  if (!confirm('Bạn có chắc chắn muốn xóa giảng viên này không?')) return;
+  try {
+    await axios.delete(`/lecturers/delete/${id}`);
+    await fetchLecturers(); // ✅ gọi hàm thật sự
+    alert('✅ Xóa giảng viên thành công!');
+  } catch (err) {
+    console.error('❌ Lỗi khi xóa giảng viên:', err.response?.data || err.message);
+  }}
 
 // =============================
 // MODALS & FORM - Sinh viên

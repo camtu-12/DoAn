@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\GiangVien;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Container\Attributes\Auth;
 
 
 namespace App\Http\Controllers;
@@ -193,5 +193,25 @@ public function ketQua(Request $request)
 
     return response()->json($data);
 }
-}
+public function addLecturer(Request $request) {
+        $themgv = GiangVien::create($request->all());
+        return response()->json($themgv, 201);
+    }
+public function deleteLecturer($id) {
+        $gv = GiangVien::find($id);
+        if (!$gv) {
+            return response()->json(['message' => 'Giảng viên không tồn tại'], 404);
+        }
+        $gv->delete();
+        return response()->json(['message' => 'Đã xóa giảng viên'], 200);
+    }
 
+public function updateLecturer(Request $request, $id) {
+        $gv = GiangVien::find($id);
+        if (!$gv) {
+            return response()->json(['message' => 'Giảng viên không tồn tại'], 404);
+        }
+        $gv->update($request->all());
+        return response()->json($gv, 200);
+    }  
+}

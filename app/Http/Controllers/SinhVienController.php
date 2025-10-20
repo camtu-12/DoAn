@@ -96,4 +96,12 @@ public function examSchedule() {
     ]);
 }
 
+public function updateStudent(Request $request, $id) {
+        $gv = SinhVien::find($id);
+        if (!$gv) {
+            return response()->json(['message' => 'Sinh viên không tồn tại'], 404);
+        }
+        $gv->update($request->all());
+        return response()->json($gv, 200);
+    }  
 }
