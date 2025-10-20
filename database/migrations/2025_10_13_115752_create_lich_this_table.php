@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lich_this', function (Blueprint $table) {
-            $table->id();
+            $table->string('MaMT')->foreignId('MaMT')->constrained('')->cascadeOnDelete();
             $table->string('Mon_Hoc');
             $table->date('Ngay_Thi');
             $table->time('Gio_Bat_Dau');

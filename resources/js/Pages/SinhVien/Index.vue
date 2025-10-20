@@ -11,7 +11,6 @@
           <ul class="menu-list">
             <li :class="{ active: currentTab === 'info' }" @click="currentTab = 'info'">Thông tin cá nhân</li>
             <li :class="{ active: currentTab === 'attendance' }" @click="currentTab = 'attendance'">Kết quả điểm danh</li>
-            <li :class="{ active: currentTab === 'exam' }" @click="currentTab = 'exam'">Lịch thi & Phòng thi</li>
             <li :class="{ active: currentTab === 'password' }" @click="currentTab = 'password'">Đổi mật khẩu</li>
           </ul>
         </nav>
@@ -81,15 +80,7 @@
         </ul>
       </section>
 
-      <!-- Lịch thi & Phòng thi -->
-      <section v-if="currentTab === 'exam'" class="section">
-        <p class="Tieude">Lịch thi & Phòng thi</p>
-        <ul>
-          <li v-for="exam in exams" :key="exam.id">
-            <strong>{{ exam.subject }}</strong> - {{ exam.date }} - Phòng: {{ exam.room }}
-          </li>
-        </ul>
-      </section>
+    
 
       <!-- Đổi mật khẩu -->
       <section v-if="currentTab === 'password'" class="section">

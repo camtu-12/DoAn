@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('sinhviens', function (Blueprint $table) {
             
-            $table->id();
             $table->string('Ho_va_ten', 120);
             $table->string('Email',191)->unique();; 
             $table->date('Ngay_Sinh')->nullable();
-            $table->string('Mssv')->unique();
+            $table->string('Mssv')->primary()->unique();
             $table->string('Lop');
             $table->string('Khoa');
             $table->string('Photo')->nullable();
+            $table->boolean('KQDD')->default(false);
             $table->timestamps();
         });
     }

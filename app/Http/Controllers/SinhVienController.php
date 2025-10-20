@@ -8,39 +8,39 @@ use Illuminate\Http\Request;
 
 class SinhVienController extends Controller
 {
-    // GET /api/sinhviens
+    // GET /sinhviens
     public function index()
     {
         return response()->json(SinhVien::all());
     }
 
-    // GET /api/sinhviens/{id}
+    // GET /sinhviens/{id}
     public function show($id)
     {
         return SinhVien::findOrFail($id); // Trả về 1 sinh viên
     }
 
-    // POST /api/sinhviens
+    // POST /sinhviens
     public function store(Request $request)
     {
         $data = $request->validate([
             'ho' => 'required|string',
             'ten' => 'required|string',
-            'mssv' => 'required|string|unique:sinh_viens,mssv',
+            'mssv' => 'required|string|unique:sinhviens,mssv',
             'lop' => 'required|string',
         ]);
 
         return SinhVien::create($data);
     }
 
-    // PUT /api/sinhviens/{id}
+    // PUT /sinhviens/{id}
     public function update(Request $request, $id)
     {
         $sv = SinhVien::findOrFail($id);
 
         $data = $request->validate([
             'hovaten' => 'sometimes|string',
-            'mssv' => 'sometimes|string|unique:sinh_viens,mssv,'.$id,
+            'mssv' => 'sometimes|string|unique:sinhviens,mssv,'.$id,
             'lop' => 'sometimes|string',
         ]);
 
@@ -49,7 +49,7 @@ class SinhVienController extends Controller
         return $sv;
     }
 
-    // DELETE /api/sinhviens/{id}
+    // DELETE /sinhviens/{id}
     public function destroy($id)
     {
         $sv = SinhVien::findOrFail($id);

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class SinhVien extends Model
 {
     use HasFactory; 
+    protected $table = 'sinhviens';
     protected $fillable = 
-    ['Ho_va_ten','Email','NgaySinh','Mssv','Lop','Khoa','Photo'];
+    ['Ho_va_ten','Email','NgaySinh','Mssv','Lop','Khoa','Photo', 'KQDD'];
 }

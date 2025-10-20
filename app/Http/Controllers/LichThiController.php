@@ -21,7 +21,7 @@ class LichThiController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'sinh_vien_id'=>'required|exists:sinh_viens,id',
+            'sinh_vien_id'=>'required|exists:sinhviens,id',
             'giang_vien_id'=>'required|exists:giang_viens,id',
             'phong_thi_id'=>'required|exists:phong_this,id',
             'ngay_gio'=>'required|date',
@@ -33,7 +33,7 @@ class LichThiController extends Controller
     {
         $lt = LichThi::findOrFail($id);
         $data = $request->validate([
-            'sinh_vien_id'=>'sometimes|exists:sinh_viens,id',
+            'sinh_vien_id'=>'sometimes|exists:sinhviens,id',
             'giang_vien_id'=>'sometimes|exists:giang_viens,id',
             'phong_thi_id'=>'sometimes|exists:phong_this,id',
             'ngay_gio'=>'sometimes|date',

@@ -11,7 +11,7 @@ use App\Models\PhongThi;
 class PhanCongGiamThi extends Model
 {
      use HasFactory;
-    protected $fillable = ['exam_id','teacher_id','phong_thi_id','role'];
+    protected $fillable = ['MaMT','MaGV','So_Phong'];
 
     public function giangvien() { return $this->belongsTo(GiangVien::class); }
     public function phongthi() { return $this->belongsTo(PhongThi::class); }

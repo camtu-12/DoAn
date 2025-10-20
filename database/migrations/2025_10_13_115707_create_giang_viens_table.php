@@ -12,12 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('giang_viens', function (Blueprint $table) {
-            $table->id(); 
-            $table->string('Ho', 120);
-            $table->string('Ten', 120);
+            $table->string('MaGV')->primary(); // Khóa chính
+            $table->string('Ho_va_Ten', 120);
             $table->string('Email')->unique()->nullable(); 
             $table->string('Sdt')->nullable();
-            $table->string('Bo_Mon')->nullable();
             $table->timestamps();
         });
     }

@@ -91,3 +91,52 @@ Route::prefix('sinhvien')->group(function () {
 });
 
 
+
+
+Route::prefix('giangvien')->group(function () {
+    Route::get('/doimatkhau', [GiangVienController::class, 'showDoiMatKhau'])->name('giangvien.doimatkhau');
+    Route::post('/doimatkhau', [GiangVienController::class, 'updateMatKhau'])->name('giangvien.updateMatKhau');
+});
+
+Route::middleware('auth:sanctum')->get('/giangvien/thongtin', [GiangVienController::class, 'thongTin']);
+
+Route::middleware('auth')->get('/giangvien/lichgac', [GiangVienController::class, 'lichGac']);
+Route::middleware('auth')->get('/giangvien/ketqua', [GiangVienController::class, 'ketQua']);
+
+
+Route::middleware('auth')->group(function () {
+    Route::get('/giangvien/thongtin', [GiangVienController::class, 'thongtin']);
+    Route::get('/giangvien/lichgac', [GiangVienController::class, 'lichGac']);
+    Route::get('/giangvien/ketqua', [GiangVienController::class, 'ketQua']);
+});
+Route::middleware('auth')->group(function () {
+    Route::get('/giangvien/lichgac', [GiangVienController::class, 'lichGac']);
+});
+
+
+Route::middleware('auth')->group(function () {
+    Route::get('/admin/lecturers', [AdminController::class, 'lecturers']);
+    Route::get('/admin/students',   [AdminController::class, 'students']);
+    Route::get('/admin/schedules',  [AdminController::class, 'schedules']);
+    Route::get('/admin/attendance', [AdminController::class, 'attendance']);
+});
+
+// API nhẹ cho trang Admin
+Route::get('/admin/lecturers', [AdminController::class, 'lecturers'])->middleware(['auth','verified']);
+Route::get('/admin/students',   [AdminController::class, 'students'])->middleware(['auth','verified']);
+Route::get('/admin/schedules',  [AdminController::class, 'schedules'])->middleware(['auth','verified']);
+Route::get('/admin/attendance', [AdminController::class, 'attendance'])->middleware(['auth','verified']);
+
+Route::get('/test/admin-schedules-sample', function () {
+    return response()->json([
+        ['id'=>1,'lecturerCode'=>'gv1@example.com','subjectCode'=>'MT101','subjectName'=>'Cơ sở dữ liệu','date'=>'2025-11-01','start'=>'08:00','end'=>'10:00','note'=>'','room'=>'C103'],
+    ]);
+});
+
+Route::get('/lecturers', [AdminController::class, 'getLecturers']);
+Route::get('/students', [AdminController::class, 'getStudents']);
+Route::get('/schedules', [AdminController::class, 'getSchedules']); //lich thi phan cong
+Route::post('/schedules/add', [AdminController::class, 'addSchedule']);
+Route::put('/schedules/update/{id}', [AdminController::class, 'updateSchedule']);
+Route::delete('/schedules/delete/{id}', [AdminController::class, 'deleteSchedule']);
+

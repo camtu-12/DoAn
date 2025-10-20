@@ -56,4 +56,8 @@ class User extends Authenticatable
         }
         return false;
     }
+    public function teacher()
+{
+    return $this->hasOne(GiangVien::class, 'Email', 'email');
+}
 }
