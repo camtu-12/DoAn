@@ -16,7 +16,7 @@
           <ul>
             <li :class="{active: activePage==='home'}" @click="activePage='home'">Trang chủ</li>
             <li :class="{active: activePage==='schedule'}" @click="activePage='schedule'">Lịch gác thi & Phòng gác thi</li>
-            <li :class="{active: activePage==='attendance'}" @click="activePage='attendance'">Điểm danh sinh viên</li>
+            <li :class="{active: activePage==='attendance'}" @click="activePage='attendance'">Kết quả điểm danh</li>
             <li :class="{active: activePage==='lecturers'}" @click="activePage='lecturers'">Quản lí giảng viên</li>
             <li :class="{active: activePage==='students'}" @click="activePage='students'">Quản lí sinh viên</li>
             <li :class="{active: activePage==='password'}" @click="activePage='password'">Đổi mật khẩu</li>
@@ -201,7 +201,44 @@
       </main>
     </div>
 
-    <!-- FORMS / MODALS -->
+   
+
+    <!-- FORMS / MODALS cua lich thi -->
+    <div v-if="showScheduleModal" class="modal">
+      <div class="modal-card wide">
+        <h3>{{ scheduleEditingIndex === null ? 'Thêm lịch thi' : 'Sửa lịch thi' }}</h3>
+        <div class="form-grid">
+          <div class="form-row"><label>Mã giảng viên</label><input v-model="scheduleForm.lecturerCode" /></div>
+          <div class="form-row"><label>Mã môn</label><input v-model="scheduleForm.S_id" /></div>
+          <div class="form-row"><label>Môn thi</label><input v-model="scheduleForm.Mon_Hoc" /></div>
+          <div class="form-row"><label>Ngày</label><input type="date" v-model="scheduleForm.Ngay_Thi" /></div>
+          <div class="form-row"><label>Giờ bắt đầu</label><input type="time" v-model="scheduleForm.Gio_Bat_Dau" /></div>
+          <div class="form-row"><label>Giờ kết thúc</label><input type="time" v-model="scheduleForm.Gio_Ket_Thuc" /></div>
+          <div class="form-row full"><label>Ghi chú</label><input v-model="scheduleForm.Ghi_Chu" /></div>
+        </div>
+        <div class="form-row actions"><button @click="saveSchedule">Lưu</button><button @click="closeScheduleForm">Hủy</button></div>
+      </div>
+    </div>
+    <!-- FORMS / MODALS cua diem danh sinh vien-->
+    <div v-if="showAttendanceModal" class="modal">
+      <div class="modal-card">
+        <h3>Thêm điểm danh</h3>
+        <div class="form-row"><label>MSSV</label><input v-model="attendanceForm.mssv" /></div>
+        <div class="form-row"><label>Tên</label><input v-model="attendanceForm.name" /></div>
+        <div class="form-row"><label>Môn</label><input v-model="attendanceForm.subject" /></div>
+        <div class="form-row"><label>Ngày</label><input type="date" v-model="attendanceForm.date" /></div>
+        <div class="form-row"><label>Thời gian</label><input type="time" v-model="attendanceForm.time" /></div>
+        <div class="form-row"><label>Trạng thái</label>
+          <select v-model="attendanceForm.status">
+            <option>Có mặt</option>
+            <option>Vắng</option>
+          </select>
+        </div>
+        <div class="form-row actions"><button @click="saveAttendance">Lưu</button><button @click="closeAttendanceForm">Hủy</button></div>
+      </div>
+    </div>
+
+     <!-- FORMS / MODALS cua giang vien -->
           <div v-if="showLecturerModal" class="modal">
           <div class="modal-card">
             <h3>{{ lecturerEditingIndex === null ? 'Thêm giảng viên' : 'Sửa giảng viên' }}</h3>
@@ -230,41 +267,54 @@
 
   
 
-    <!-- FORMS / MODALS -->
-    <div v-if="showScheduleModal" class="modal">
-      <div class="modal-card wide">
-        <h3>{{ scheduleEditingIndex === null ? 'Thêm lịch thi' : 'Sửa lịch thi' }}</h3>
-        <div class="form-grid">
-          <div class="form-row"><label>Mã giảng viên</label><input v-model="scheduleForm.lecturerCode" /></div>
-          <div class="form-row"><label>Mã môn</label><input v-model="scheduleForm.S_id" /></div>
-          <div class="form-row"><label>Môn thi</label><input v-model="scheduleForm.Mon_Hoc" /></div>
-          <div class="form-row"><label>Ngày</label><input type="date" v-model="scheduleForm.Ngay_Thi" /></div>
-          <div class="form-row"><label>Giờ bắt đầu</label><input type="time" v-model="scheduleForm.Gio_Bat_Dau" /></div>
-          <div class="form-row"><label>Giờ kết thúc</label><input type="time" v-model="scheduleForm.Gio_Ket_Thuc" /></div>
-          <div class="form-row full"><label>Ghi chú</label><input v-model="scheduleForm.Ghi_Chu" /></div>
-        </div>
-        <div class="form-row actions"><button @click="saveSchedule">Lưu</button><button @click="closeScheduleForm">Hủy</button></div>
-      </div>
-    </div>
-
-    <div v-if="showAttendanceModal" class="modal">
-      <div class="modal-card">
-        <h3>Thêm điểm danh</h3>
-        <div class="form-row"><label>MSSV</label><input v-model="attendanceForm.mssv" /></div>
-        <div class="form-row"><label>Tên</label><input v-model="attendanceForm.name" /></div>
-        <div class="form-row"><label>Môn</label><input v-model="attendanceForm.subject" /></div>
-        <div class="form-row"><label>Ngày</label><input type="date" v-model="attendanceForm.date" /></div>
-        <div class="form-row"><label>Thời gian</label><input type="time" v-model="attendanceForm.time" /></div>
-        <div class="form-row"><label>Trạng thái</label>
-          <select v-model="attendanceForm.status">
-            <option>Có mặt</option>
-            <option>Vắng</option>
-          </select>
-        </div>
-        <div class="form-row actions"><button @click="saveAttendance">Lưu</button><button @click="closeAttendanceForm">Hủy</button></div>
-      </div>
-    </div>
+  <!-- FORMS / MODALS cua quản lý sinh viên-->
     
+          <div v-if= "showStudentModal" class="modal">
+          <div class="modal-card">
+            <h3>{{ studentEditingIndex === null ? 'Thêm sinh viên' : 'Sửa sinh viên' }}</h3>
+        
+            <div class="form-row">
+              <label>Họ tên</label>
+              <input v-model="studentForm.Ho_va_ten" />
+            </div>
+            <div class="form-row">
+              <label>Email</label>
+              <input v-model="studentForm.Email" />
+            </div>
+            <div class="form-row">
+              <label>Ngày sinh</label>
+              <input v-model="studentForm.Ngay_Sinh" />
+            </div>
+            <div class="form-row">
+              <label>MSSV</label>
+              <input v-model="studentForm.Mssv" />
+            </div>
+            <div class="form-row">
+              <label>Lớp</label>
+              <input v-model="studentForm.Lop" />
+            </div>
+            <div class="form-row">
+              <label>Khoa</label>
+              <input v-model="studentForm.Khoa" />  
+            </div>
+            <div class="form-row">
+              <label>Ảnh</label>
+              <input type="file" @change="handleFileUpload" />
+              <div v-if="previewImage">
+                <img :src="previewImage" alt="Preview" style="max-width: 200px; margin-top: 10px;" />
+              </div>
+            </div>
+            <div class="form-row actions">
+              <button @click="saveStudent">Lưu</button>
+              <button @click="closeStudentForm">Hủy</button>
+            </div>
+          </div>
+        </div>
+
+
+
+
+
   </div>
 </template>
 
@@ -280,12 +330,12 @@ axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 const activePage = ref('home')
 const pageTitle = computed(() => {
   switch (activePage.value) {
-    case 'home': return 'Trang chủ'
-    case 'schedule': return 'Lịch gác thi & Phòng gác thi'
-    case 'attendance': return 'Điểm danh sinh viên'
-    case 'results': return 'Kết quả điểm danh'
-    case 'lecturers': return 'Quản lí giảng viên'
-    case 'students': return 'Quản lí sinh viên'
+    case 'home': return 'TRANG CHỦ'
+    case 'schedule': return 'LỊCH GÁC THI & PHÒNG GÁC THI'
+    case 'attendance': return 'KẾT QUẢ ĐIỂM DANH'
+
+    case 'lecturers': return 'QUẢN LÍ GIẢNG VIÊN'
+    case 'students': return 'QUẢN LÍ SINH VIÊN'
     default: return ''
   }
 })
@@ -442,12 +492,25 @@ async function deleteLecturer(id){
 // MODALS & FORM - Sinh viên
 // =============================
 const showStudentModal = ref(false)
-const studentForm = reactive({ name:'', email:'', birthday:'', mssv:'', class:'', faculty:'', photo:'' })
+const studentForm = reactive({ Ho_va_ten:'', Email:'', Ngay_Sinh:'', Mssv:'', Lop:'', Khoa:'', Photo:'', KQDD:''})
 const studentEditingIndex = ref(null)
+
+
+
+const previewImage = ref(null)
+
+function handleFileUpload(event) {
+  const file = event.target.files[0]
+  if (file) {
+    studentForm.value.Photo = file
+    previewImage.value = URL.createObjectURL(file) // để hiển thị ảnh xem trước
+  }
+}
+
 
 function openStudentForm(item=null, idx=null){
   if(item){ Object.assign(studentForm, item); studentEditingIndex.value = idx }
-  else { Object.assign(studentForm, { name:'', email:'', birthday:'', mssv:'', class:'', faculty:'', photo:''}); studentEditingIndex.value = null }
+  else { Object.assign(studentForm, { Ho_va_ten:'', Email:'', Ngay_Sinh:'', Mssv:'', Lop:'', Khoa:'', Photo:'',KQDD:''}); studentEditingIndex.value = null }
   showStudentModal.value = true
 }
 function closeStudentForm(){ showStudentModal.value = false }
@@ -455,7 +518,7 @@ function onStudentPhoto(e){
   const f = e.target.files[0]
   if(!f) return
   const reader = new FileReader()
-  reader.onload = ev => studentForm.photo = ev.target.result
+  reader.onload = ev => studentForm.Photo = ev.target.result
   reader.readAsDataURL(f)
 }
 function saveStudent(){
@@ -613,7 +676,7 @@ init()
 .topbar{height:76px;background:linear-gradient(90deg,var(--blue1),var(--blue2));color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
 .topbar .brand{font-size:22px;font-weight:700;letter-spacing:1px}
 .layout{display:flex}
-.sidebar{width:240px;background:#e6eaec;padding-top:20px;min-height:calc(100vh - 76px)}
+.sidebar{width:300px;background:#e6eaec;padding-top:20px;min-height:calc(100vh - 76px)}
 .sidebar nav ul{list-style:none;padding:0;margin:0}
 .sidebar nav li{padding:18px 20px;color:#234;cursor:pointer;border-left:6px solid transparent}
 .sidebar nav li.active{background:#dcdfe0;border-left-color:#2f86d1;color:#0b4f85}
