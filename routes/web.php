@@ -17,6 +17,7 @@ use App\Http\Controllers\PhongThiController;
 use App\Http\Controllers\LichThiController;
 use App\Http\Controllers\PhanCongGiamThiController;
 use App\Models\GiangVien;
+use App\Models\LichThi;
 use App\Models\SinhVien;
 
 // Trang chủ
@@ -137,13 +138,22 @@ Route::get('/test/admin-schedules-sample', function () {
 Route::get('/lecturers', [AdminController::class, 'getLecturers']);
 Route::get('/students', [AdminController::class, 'getStudents']);
 Route::get('/schedules', [AdminController::class, 'getSchedules']); //lich thi phan cong
-Route::post('/schedules/add', [AdminController::class, 'addSchedule']);
-Route::put('/schedules/update/{id}', [AdminController::class, 'updateSchedule']);
-Route::delete('/schedules/delete/{id}', [AdminController::class, 'deleteSchedule']);
+
+
+
+
+
+//chuc năng thêm xoa sua lịch thi
+Route::post('/schedules/add', [LichThiController::class, 'addSchedule']);
+Route::put('/schedules/update/{id}', [LichThiController::class, 'updateSchedule']);
+Route::delete('/schedules/delete/{id}', [LichThiController::class, 'deleteSchedule']);
+
 
 //chức năng thêm xóa sửa trong giảng viên
 Route::post('/lecturers/add', [GiangVienController::class, 'addLecturer']);
 Route::delete('/lecturers/delete/{id}', [GiangVienController::class, 'deleteLecturer']);
 Route::put('/lecturers/update/{id}', [GiangVienController::class, 'updateLecturer']);
+
+//chức năng thêm xóa sửa trong sinh viên
 Route::put('/sinhviens/update/{id}', [SinhVienController::class, 'updateStudent']);
 

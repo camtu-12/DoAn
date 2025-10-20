@@ -47,4 +47,29 @@ class LichThiController extends Controller
         LichThi::findOrFail($id)->delete();
         return response()->json(['message'=>'Đã xóa lịch thi']);
     }
+
+
+    public function addSchedule(Request $request) {
+        $schedule = LichThi::create($request->all());
+        return response()->json($schedule, 201);
+    }
+    public function updateSchedule(Request $request, $id)
+{
+    $schedule = LichThi::findOrFail($id);
+    $schedule->update($request->all());
+    return response()->json($schedule, 200);
+}
+public function deleteSchedule($id)
+{
+    $schedule = LichThi::find($id);
+
+    if (!$schedule) {
+        return response()->json(['message' => 'Không tìm thấy lịch thi'], 404);
+    }
+
+    $schedule->delete();
+
+    return response()->json(['message' => 'Đã xóa lịch thi thành công'], 200);
+}
+
 }

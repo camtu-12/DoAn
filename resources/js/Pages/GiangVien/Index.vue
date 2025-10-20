@@ -71,7 +71,7 @@
 
       <!-- Lịch gác thi -->
        <section v-if="activeTab === 'schedule'">
-        <h2>Lịch và phòng gác thi</h2>
+        <h2>LỊCH VÀ PHÒNG GÁC THI</h2>
         <table class="table">
           <thead>
             <tr>
@@ -97,7 +97,7 @@
 
       <!-- Điểm danh sinh viên -->
       <section v-if="activeTab === 'attendance'">
-        <h2>Điểm danh sinh viên (AWS Rekognition)</h2>
+        <h2>ĐIỂM DANH SINH VIÊN</h2>
         <div class="attendance-box">
           <video ref="video" autoplay playsinline></video>
           <button @click="captureImage" class="btn-scan">Điểm danh</button>
@@ -106,7 +106,7 @@
 
       <!-- Kết quả điểm danh -->
       <section v-if="activeTab === 'result'">
-        <h2>Kết quả điểm danh</h2>
+        <h2> KẾT QUẢ ĐIỂM DANH </h2>
         <table class="table">
           <thead>
             <tr>
@@ -341,8 +341,14 @@ h2 {
   font-weight: bold;
   margin-bottom: 20px;
 }
-.tt, h1, h2, label, li, p {
+.tt{
   color: #0c7de7;
+  font-size: 28px;
+}
+.h1, h2, label, li, p {
+  color: #0c7de7;
+  font-size: 28px;
+  text-align: center;
 }
 .centered-section {
   display: flex;
@@ -383,13 +389,15 @@ h2 {
   align-items: center;
   gap: 20px;
   width: 100%;
+  
 }
 
 .form-row label {
   font-weight: 600;
-  width: 180px;
+  width: 220px;
   text-align: left;
   color: #0c7de7;
+  font-size: 20px;
 }
 
 .form-row input {

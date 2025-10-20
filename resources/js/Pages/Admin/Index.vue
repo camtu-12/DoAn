@@ -682,7 +682,7 @@ init()
 .sidebar nav li.active{background:#dcdfe0;border-left-color:#2f86d1;color:#0b4f85}
 .content{flex:1;padding:36px 48px;background:#eef4f6;min-height:calc(100vh - 76px)}
 .card{background:#fff;border-radius:12px;padding:28px;box-shadow:0 8px 20px rgba(0,0,0,0.06)}
-.card-title{text-align:center;color:#1e73be;margin-bottom:18px;font-weight:700}
+.card-title{text-align:center;color:#1e73be;margin-bottom:18px;font-weight:700;font-size:28px}
 .page-body{padding:10px 6px}
 .toolbar{display:flex;justify-content:right;align-items:center;margin-bottom:12px}
 .search input{padding:8px 12px;border-radius:6px;border:1px solid #ccc;width:360px}
