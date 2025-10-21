@@ -1,294 +1,434 @@
-﻿<template>
-  <div class="dashboard-container">
-    <!-- Sidebar -->
+﻿
+<template>
+        <header class="header" >
+      <h1 class="ppp">HỆ THỐNG HỖ TRỢ GIÁM THỊ ĐIỂM DANH SINH VIÊN BẰNG HÌNH ẢNH</h1>
+       <div class="sidebar-logout">
+  <button class="logout" @click="logout">
+    <i class="fa-solid fa-right-from-bracket"></i>
+  </button>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</div>
+    </header>
+
+  <div class="app">
+
+    <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="profile">
-        <div class="avatar">SV</div>
-        <h3>Sinh Viên</h3>
+      
 
-        <!-- Menu chức năng -->
-        <nav>
-          <ul class="menu-list">
-            <li :class="{ active: currentTab === 'info' }" @click="currentTab = 'info'">Thông tin cá nhân</li>
-            <li :class="{ active: currentTab === 'attendance' }" @click="currentTab = 'attendance'">Kết quả điểm danh</li>
-            <li :class="{ active: currentTab === 'password' }" @click="currentTab = 'password'">Đổi mật khẩu</li>
-          </ul>
-        </nav>
-      </div>
+      <nav class="menu">
+        <button @click="activeTab = 'info'" :class="{ active: activeTab === 'info' }">
+          Thông tin sinh viên
+        </button>
+        <button @click="activeTab = 'result'" :class="{ active: activeTab === 'result' }">
+          Kết quả điểm danh
+        </button>
+         <button @click="activeTab = 'password'" :class="{ active: activeTab === 'password' }">
+          Đổi mật khẩu
+        </button>
+      </nav>
 
-      <!-- Nút đăng xuất -->
-      <div class="sidebar-logout">
-        <button class="logout-btn" @click="logout">Đăng xuất</button>
-      </div>
+      
     </aside>
 
-    <!-- Main Content -->
+    <!-- MAIN CONTENT -->
     <main class="main-content">
-      <header class="topbar">
-        <h2>Xin chào, {{ student.name }}</h2>
-      </header>
-
       <!-- Thông tin cá nhân -->
-      <section v-if="currentTab === 'info'" class="section">
-        <p class="Tieude">Thông tin cá nhân</p>
+     <section v-if="activeTab === 'info'" class="centered-section">
+  <h2 class="tt">THÔNG TIN SINH VIÊN</h2>
 
-        <form @submit.prevent="updateProfile">
-          <label>Họ và tên:</label>
-          <input type="text" v-model="name" required />
+  <form class="info-form" @submit.prevent="updateInfo">
+    <div class="form-row">
+      <label>Họ và tên:</label>
+    </div>
 
-          <label>Email:</label>
-          <input type="email" v-model="student.email" required />
+    <div class="form-row">
+      <label>Email:</label>
+    </div>
 
-          <label>Ngày sinh:</label>
-          <input type="date" v-model="student.ngay_sinh" required />
+    <div class="form-row">
+      <label>Số điện thoại:</label>
+    </div>
 
-          <label>MSSV:</label>
-          <input type="text" v-model="student.mssv" required />
+    <div class="form-row">
+      <label>Khoa:</label>
+    </div>
 
-          <label>Lớp:</label>
-          <input type="text" v-model="student.lop" required />
-
-          <label>Khoa:</label>
-          <select v-model="student.khoa" required>
-            <option disabled value="">-- Chọn khoa --</option>
-            <option>Công Nghệ Thông Tin</option>
-            <option>Quản Trị Kinh Doanh</option>
-            <option>Kỹ thuật Công Trình</option>
-            <option>Điện - Điện Thử</option>
-            <option>Công Nghệ Thực Phẩm</option>
-            <option>Design</option>
-            <option>Luật Kinh Tế</option>
-          </select>
-
-          <img :src="student.photo_url" alt="Ảnh sinh viên" class="avatar-img" />
-
-          <button type="submit" class="update-btn">Cập nhật thông tin</button>
-        </form>
-        <p v-if="profileMessage">{{ profileMessage }}</p>
-      </section>
+    <button type="submit" class="btn-update">Cập nhật thông tin</button>
+  </form>
+</section>
 
       <!-- Kết quả điểm danh -->
-      <section v-if="currentTab === 'attendance'" class="section">
-        <p class="Tieude">Kết quả điểm danh</p>
-        <ul>
-          <li v-for="record in attendance" :key="record.id">
-            {{ record.subject }} - {{ record.date }}:
-            <span :class="record.status === 'Đã điểm danh' ? 'checked' : 'not-checked'">
-              {{ record.status }}
-            </span>
-          </li>
-        </ul>
+      <section v-if="activeTab === 'result'">
+        <h2> KẾT QUẢ ĐIỂM DANH </h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>MSSV</th>
+              <th>Họ tên</th>
+              <th>Ngày thi</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+        </table>
       </section>
 
-    
+           <!-- Đổi mật khẩu -->
+    <!-- Đổi mật khẩu -->
+<section v-if="activeTab === 'password'" class="centered-section">
+  <h2 class="tt">ĐỔI MẬT KHẨU</h2>
 
-      <!-- Đổi mật khẩu -->
-      <section v-if="currentTab === 'password'" class="section">
-        <p class="Tieude">Đổi mật khẩu</p>
-        <form @submit.prevent="changePassword">
-          <label>Mật khẩu hiện tại:</label>
-          <input type="password" v-model="password.old" required />
-          <label>Mật khẩu mới:</label>
-          <input type="password" v-model="password.new" required />
-          <label>Xác nhận mật khẩu mới:</label>
-          <input type="password" v-model="password.confirm" required />
-          <button type="submit" class="update-btn">Cập nhật mật khẩu</button>
-        </form>
-        <p v-if="passwordMessage">{{ passwordMessage }}</p>
-      </section>
+  <form class="info-form" @submit.prevent="changePassword">
+    <div class="form-row">
+      <label>Mật khẩu hiện tại:</label>
+      <input type="password" v-model="password.old" required />
+    </div>
+
+    <div class="form-row">
+      <label>Mật khẩu mới:</label>
+      <input type="password" v-model="password.new" required />
+    </div>
+
+    <div class="form-row">
+      <label>Xác nhận mật khẩu mới:</label>
+      <input type="password" v-model="password.confirm" required />
+    </div>
+
+    <button type="submit" class="btn-update">Đổi mật khẩu</button>
+  </form>
+
+  <p v-if="passwordMessage">{{ passwordMessage }}</p>
+</section>
+
+
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import axios from 'axios'
 import { router } from '@inertiajs/vue3'
-// 🧠 Reactive state (thay cho data())
-const currentTab = ref('info')
-const student = ref({
-  ho: '',
-  ten: '',
-  email: '',
-  ngay_sinh: '',
-  mssv: '',
-  lop: '',
-  khoa: '',
-  photo: ''
-})
-const attendance = ref([])
-const exams = ref([])
-const password = ref({ old: '', new: '', confirm: '' })
-const passwordMessage = ref('')
-const profileMessage = ref('')
-
-
-// Computed property to combine and split name
-const name = computed({
-  get() {
-    return `${student.value.ho} ${student.value.ten}`.trim()
-  },
-  set(value) {
-    // Split the full name when edited
-    const parts = value.split(' ')
-    student.value.ten = parts.pop() // last word = ten
-    student.value.ho = parts.join(' ') // rest = ho
-  }
-})
-// 🧩 Hàm logout
+import axios from 'axios'
+import { ref, onMounted } from 'vue'
+// tab hiện tại
+const activeTab = ref('info')
+ // mật khẩu
+ const password = ref({ old: '', new: '', confirm: '' })
+ const passwordMessage = ref('')
+ 
+ const changePassword = async () => {
+   if (password.value.new !== password.value.confirm) {
+     passwordMessage.value = '❌ Mật khẩu xác nhận không khớp.'
+     return
+   }
+   try {
+     const res =  await axios.post('/giangvien/doimatkhau', {
+       old_password: password.value.old,
+       new_password: password.value.new,
+       // optional confirmation if backend expects it
+      new_password_confirmation: password.value.confirm
+     })
+     passwordMessage.value = res.data.message ||'✅ Đổi mật khẩu thành công.'
+     password.value = { old: '', new: '', confirm: '' }
+   } catch (err) {
+     passwordMessage.value = (err.response && err.response.data && err.response.data.message) || '❌ Đổi mật khẩu thất bại.'
+     console.error(err)
+   }
+ }
+ 
+// dữ liệu giảng viên
 function logout() {
-  router.post(route('logout'))
-}
-
-// 🧩 Gọi API
-async function fetchStudentInfo() {
-  const res = await axios.get('/sinhvien/thongtin')
-  student.value = res.data
-}
-
-async function fetchAttendance() {
-  const res = await axios.get('/sinhvien/diemdanh')
-  attendance.value = res.data
-}
-
-async function fetchExamSchedule() {
-  const res = await axios.get('/sinhvien/lichthi')
-  exams.value = res.data
-}
-
-async function changePassword() {
-  if (password.value.new !== password.value.confirm) {
-    passwordMessage.value = '❌ Mật khẩu xác nhận không khớp.'
-    return
-  }
+  router.post(route('logout'))}
+// dữ liệu lịch gác thi & kết quả điểm danh
+const schedules = ref([])
+const results = ref([])
+// fetch functions
+const fetchTeacher = async () => {
   try {
-    await axios.post('/sinhvien/doimatkhau', password.value)
-    passwordMessage.value = '✅ Đổi mật khẩu thành công.'
-    password.value = { old: '', new: '', confirm: '' }
-  } catch {
-    passwordMessage.value = '❌ Đổi mật khẩu thất bại.'
+    // điều chỉnh URL nếu backend của bạn dùng /api/...
+    const res = await axios.get('/giangvien/thongtin')
+    // nếu backend trả object khác, map lại cho phù hợp
+    teacher.value = {
+      Ten: res.data.Ten ?? res.data.ten ?? (res.data.name || ''),
+      Email: res.data.Email ?? res.data.email ?? '',
+      Sdt: res.data.Sdt ?? res.data.sdt ?? '',
+      Bo_Mon: res.data.Bo_Mon ?? res.data.bo_mon ?? ''
+    }
+  } catch (err) {
+    console.error('fetchTeacher failed', err)
   }
 }
 
-async function updateProfile() {
+const fetchSchedules = async () => {
+   try {
+    console.log('GET /giangvien/lichgac -> sending')
+    const res = await axios.get('/giangvien/lichgac')
+    console.log('res.status', res.status, 'data', res.data)
+    schedules.value = res.data || []
+  } catch (err) {
+    console.error('fetchSchedules failed', err.response ? err.response.status : err.message, err.response ? err.response.data : '')
+  }
+}
+
+const fetchResults = async () => {
   try {
-    await axios.post('/sinhvien/update', student.value)
-    profileMessage.value = '✅ Cập nhật thông tin thành công.'
-  } catch {
-    profileMessage.value = '❌ Cập nhật thất bại.'
+    const res = await axios.get('/giangvien/ketqua')
+    results.value = res.data || []
+  } catch (err) {
+    console.error('fetchResults failed', err)
   }
 }
-
-// 🧩 Khi component load
 onMounted(() => {
-  fetchStudentInfo()
-  fetchAttendance()
-  fetchExamSchedule()
+  fetchSchedules()
 })
+// cập nhật thông tin
+const updateInfo = async() => {
+  try {
+    await axios.put('/giangvien/capnhat', teacher.value)
+    alert('Cập nhật thành công.')
+  } catch (err) {
+    console.error('updateInfo failed', err)
+    alert('Cập nhật thất bại.')
+  }
+}
 </script>
 
 <style scoped>
-/* (Giữ nguyên toàn bộ CSS cũ của bạn) */
-.Tieude {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-.dashboard-container {
+.app {
   display: flex;
-  height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
+  min-height: 100vh;
 }
+
 .sidebar {
-  width: 400px;
-  background-color: #2c3e50;
-  color: white;
-  padding: 20px;
+  width: 260px;
+  background: #d5d9db;
+  color: rgb(255, 255, 255);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
-.profile {
-  text-align: center;
+
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  
 }
-.avatar {
-  background-color: #3498db;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  line-height: 60px;
-  font-size: 24px;
-  margin: auto;
-}
-.menu-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 20px;
-}
-.menu-list li {
-  padding: 12px 16px;
-  cursor: pointer;
+
+.menu button {
+  background: none;
+  color: #022445;
   text-align: left;
-}
-.menu-list li.active {
-  background-color: #34495e;
-  border-radius: 4px;
-}
-.sidebar-logout {
-  margin-top: 30px;
-  text-align: center;
-}
-.logout-btn {
-  background-color: #e74c3c;
-  color: white;
+  padding: 12px 25px;
   border: none;
-  padding: 10px 20px;
-  width: 80%;
   cursor: pointer;
-  border-radius: 4px;
+  font-size: 18px;
 }
-.logout-btn:hover {
-  background-color: #c0392b;
+
+.menu button.active {
+  background: rgb(249, 249, 249);
 }
+
+
+
+.logout {
+  background: #f3f3f5;
+  border: none;
+  color: #0c7de7;
+  width: 40px;
+  height: 40px;
+  margin: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.logout:hover {
+  background: #dbe9fa;
+  transform: scale(1.05);
+}
+
+.logout i {
+  font-size: 18px;
+}
+
 .main-content {
   flex: 1;
+  background: #ecf0f1;
   padding: 30px;
-  background-color: #ecf0f1;
 }
-.topbar {
+* {
+  font-family: "Times New Roman", Times, serif;
+}
+
+
+
+h2 {
+  font-size: 20px;
+  font-weight: bold;
   margin-bottom: 20px;
 }
-.section {
-  margin-top: 20px;
+.tt{
+  color: #0c7de7;
+  font-size: 28px;
 }
-.avatar-img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
+.h1, h2, label, li, p {
+  color: #0c7de7;
+  font-size: 28px;
+  text-align: center;
 }
-.checked {
-  color: green;
-  font-weight: bold;
+.centered-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
 }
-.not-checked {
-  color: red;
-  font-weight: bold;
+
+
+
+
+
+.centered-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 80vh;
+  margin-top: 15px; /* sát hơn với tiêu đề */
 }
-form input {
-  display: block;
-  margin-bottom: 10px;
-  padding: 8px;
+
+.info-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* căn giữa toàn form */
+  gap: 18px;
+  background: #fff;
+  padding: 35px 60px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 900px; /* form rộng hơn */
+  margin-top: 15px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
   width: 100%;
+  
 }
-.update-btn {
-  padding: 10px 20px;
-  background-color: #27ae60;
+
+.form-row label {
+  font-weight: 600;
+  width: 220px;
+  text-align: left;
+  color: #0c7de7;
+  font-size: 20px;
+}
+
+.form-row input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.btn-update {
+  background: #0c7de7;
   color: white;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-top: 20px;
+  align-self: center; /* ✅ căn giữa nút */
+}
+
+.btn-update:hover {
+  background: #095cb3;
+}
+
+
+
+
+
+
+
+.btn-update {
+  background: #27ae60;
+  color: white;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.attendance-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+video {
+  width: 480px;
+  height: 360px;
+  background: black;
+  margin-bottom: 15px;
+}
+
+.btn-scan {
+  background: #39adf0;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
   border: none;
   cursor: pointer;
 }
-.update-btn:hover {
-  background-color: #1e8449;
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(90deg,#95bce1, #0c7de7);
+  color: #ffffff;
+  padding: 9px 20px;
+  font-weight: 400;
+  font-size: 24px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 6px rgba(154, 189, 237, 0.25);
 }
+
+.header h1 {
+  margin: 0;
+  margin-left: 0px; 
+  font-size: 22px;
+}
+.ppp{
+  color:#ffffff;
+  font-size: 38px;
+  font-weight: 800; /* ✅ in đậm hơn */
+   margin-left: 20px;
+}
+
+
 </style>
+
+

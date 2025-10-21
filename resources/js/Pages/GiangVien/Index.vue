@@ -73,26 +73,49 @@
        <section v-if="activeTab === 'schedule'">
         <h2>LỊCH VÀ PHÒNG GÁC THI</h2>
         <table class="table">
-          <thead>
-            <tr>
-              <th>Ngày thi</th>
-              <th>Phòng</th>
-              <th>Môn học</th>
-              <th>Giờ bắt đầu</th>
-              <th>Giờ kết thúc</th>
-            </tr>
-          </thead>
-          <tbody>
-            
-            <tr v-for="item in schedules" :key="item.id">
-              <td>{{ item.Ngay_Thi }}</td>
-              <td>{{ item.So_Phong }}</td>
-              <td>{{ item.Mon_Thi }}</td>
-              <td>{{ item.Gio_Bat_Dau }}</td>
-              <td>{{ item.Gio_Ket_Thuc }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <thead>
+          <tr>
+            <th class="border border-gray-300 px-2 py-1">STT</th>
+            <th class="border border-gray-300 px-2 py-1">Thứ</th>
+            <th class="border border-gray-300 px-2 py-1">Ngày thi</th>
+            <th class="border border-gray-300 px-2 py-1">Giờ bắt đầu</th>
+            <th class="border border-gray-300 px-2 py-1">Môn học</th>
+            <th class="border border-gray-300 px-2 py-1">Số phòng</th>
+            <th class="border border-gray-300 px-2 py-1">Danh sách sinh viên</th>
+            <th class="border border-gray-300 px-2 py-1">Danh sách giảng viên</th>
+            <th class="border border-gray-300 px-2 py-1">Ghi chú</th>
+            <th class="border border-gray-300 px-2 py-1">Ngày tạo</th>
+            <th class="border border-gray-300 px-2 py-1">Cập nhật</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(item, index) in schedules"
+            :key="item.id"
+            class="hover:bg-gray-50"
+          >
+            <td class="border border-gray-300 px-2 py-1 text-center">{{ index + 1 }}</td>
+            <td class="border border-gray-300 px-2 py-1 text-center">{{ item.Thu }}</td>
+            <td class="border border-gray-300 px-2 py-1 text-center">{{ formatDate(item.Ngay_Thi) }}</td>
+            <td class="border border-gray-300 px-2 py-1 text-center">{{ item.Gio_Bat_Dau }}</td>
+            <td class="border border-gray-300 px-2 py-1">{{ item.Mon_Hoc }}</td>
+            <td class="border border-gray-300 px-2 py-1 text-center">{{ item.So_Phong }}</td>
+            <td class="border border-gray-300 px-2 py-1">{{ item.DSSV }}</td>
+            <td class="border border-gray-300 px-2 py-1">{{ item.DSGV }}</td>
+            <td class="border border-gray-300 px-2 py-1">{{ item.Ghi_Chu }}</td>
+            <td class="border border-gray-300 px-2 py-1 text-center">{{ formatDate(item.created_at) }}</td>
+            <td class="border border-gray-300 px-2 py-1 text-center">{{ formatDate(item.updated_at) }}</td>
+            <td class="border border-gray-300 px-2 py-1 text-center">
+              <button @click="openScheduleForm(item, index)" class="bg-blue-500 text-white px-2 py-1 rounded mr-1">Sửa</button>
+              <button @click="deleteSchedule(item.id)" class="bg-red-500 text-white px-2 py-1 rounded">Xóa</button>
+            </td>
+          </tr>
+
+          <tr v-if="schedules.length === 0">
+            <td colspan="12" class="text-center text-gray-500 py-2">Không có lịch thi nào</td>
+          </tr>
+  </tbody>
+</table>
       </section>
 
       <!-- Điểm danh sinh viên -->
@@ -110,10 +133,10 @@
         <table class="table">
           <thead>
             <tr>
-              <th>MSSV</th>
-              <th>Họ tên</th>
-              <th>Ngày thi</th>
-              <th>Trạng thái</th>
+              <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">MSSV</th>
+              <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Họ tên</th>
+              <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Ngày thi</th>
+              <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Trạng thái</th>
             </tr>
           </thead>
           <tbody>
@@ -440,18 +463,9 @@ h2 {
   cursor: pointer;
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-}
-
-.table th,
-.table td {
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: left;
-}
+.table{width:100%;border-collapse:collapse;margin-top:8px}
+.table th{background:#f6f8f9;text-align:center;padding:12px;border-bottom:1px solid #eee;color:#2b5f86}
+.table td{padding:12px;border-bottom:1px solid #f1f4f5}
 
 .attendance-box {
   display: flex;

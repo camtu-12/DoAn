@@ -80,8 +80,8 @@ class GiangVienController extends Controller
 
         // map các field bạn muốn trả về
         return response()->json([
-            'Ten'     => $teacher->Ten ?? $teacher->name ?? $user->name,
-            'Email'   => $teacher->Email ?? $user->email,
+            'Ten'     => $teacher->Ho_va_Ten ?? $teacher->name ?? $user->name,
+            'Email'   => $teacher->Email ?? $teacher->Email ?? $user->email,
             'Sdt'     => $teacher->Sdt ?? $teacher->Sdt ?? 'Không có',
             'Bo_Mon'  => $teacher->Bo_Mon ?? $teacher->Bo_Mon ?? 'Không có',
         ]);

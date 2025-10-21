@@ -48,37 +48,51 @@
               </div>
             </div>
 
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Mã giảng viên</th>
-                  <th>Môn thi</th>
-                  <th>Ngày thi</th>
-                  <th>Giờ bắt đầu</th>
-                  <th>Giờ kết thúc</th>
-                  <th>Phòng</th> <!-- thêm cột Phòng -->
-                  <th>Ghi chú</th>
-                  <th>Chỉnh sửa</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(r, idx) in filteredSchedules" :key="r.id">
-                  <td>{{ r.id}}</td>
-                  <td>{{ r.Mon_Hoc }}</td>
-                  <td>{{ r.Ngay_Thi }}</td>
-                  <td>{{ r.Gio_Bat_Dau }}</td>
-                  <td>{{ r.Gio_Ket_Thuc }}</td>
-                  <td>{{ r.So_Phong }}</td> <!-- hiển thị phòng -->
-                  <td>{{ r.Ghi_Chu }}</td>
+          <table class="table">
+            <thead>
+              <tr>
+                <th class="border border-gray-300 px-2 py-1">STT</th>
+                <th class="border border-gray-300 px-2 py-1">Thứ</th>
+                <th class="border border-gray-300 px-2 py-1">Ngày thi</th>
+                <th class="border border-gray-300 px-2 py-1">Giờ bắt đầu</th>
+                <th class="border border-gray-300 px-2 py-1">Môn học</th>
+                <th class="border border-gray-300 px-2 py-1">Số phòng</th>
+                <th class="border border-gray-300 px-2 py-1">Danh sách sinh viên</th>
+                <th class="border border-gray-300 px-2 py-1">Danh sách giảng viên</th>
+                <th class="border border-gray-300 px-2 py-1">Ghi chú</th>
+                <th class="border border-gray-300 px-2 py-1">Ngày tạo</th>
+                <th class="border border-gray-300 px-2 py-1">Cập nhật</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(item, index) in schedules"
+                :key="item.id"
+                class="hover:bg-gray-50"
+              >
+                <td class="border border-gray-300 px-2 py-1 text-center">{{ index + 1 }}</td>
+                <td class="border border-gray-300 px-2 py-1 text-center">{{ item.Thu }}</td>
+                <td class="border border-gray-300 px-2 py-1 text-center">{{ formatDate(item.Ngay_Thi) }}</td>
+                <td class="border border-gray-300 px-2 py-1 text-center">{{ item.Gio_Bat_Dau }}</td>
+                <td class="border border-gray-300 px-2 py-1">{{ item.Mon_Hoc }}</td>
+                <td class="border border-gray-300 px-2 py-1 text-center">{{ item.So_Phong }}</td>
+                <td class="border border-gray-300 px-2 py-1">{{ item.DSSV }}</td>
+                <td class="border border-gray-300 px-2 py-1">{{ item.DSGV }}</td>
+                <td class="border border-gray-300 px-2 py-1">{{ item.Ghi_Chu }}</td>
+                <td class="border border-gray-300 px-2 py-1 text-center">{{ formatDate(item.created_at) }}</td>
+                <td class="border border-gray-300 px-2 py-1 text-center">{{ formatDate(item.updated_at) }}</td>
+                <td class="border border-gray-300 px-2 py-1 text-center">
+                  <button @click="openScheduleForm(item, index)" class="bg-blue-500 text-white px-2 py-1 rounded mr-1">Sửa</button>
+                  <button @click="deleteSchedule(item.id)" class="bg-red-500 text-white px-2 py-1 rounded">Xóa</button>
+                </td>
+              </tr>
 
-                  <td class="actions-cell">
-                    <button @click="openScheduleForm(r, idx)">Sửa</button>
-                    <button @click="deleteSchedule(r.id)">Xóa</button>
-                  </td>
-                </tr>
-                <tr v-if="filteredSchedules.length===0"><td colspan="8" class="empty">Không có dữ liệu</td></tr>
-              </tbody>
-            </table>
+              <tr v-if="schedules.length === 0">
+                <td colspan="12" class="text-center text-gray-500 py-2">Không có lịch thi nào</td>
+              </tr>
+          </tbody>
+    </table>
+
           </div>
 
           <!-- ATTENDANCE (raw check-in admin) -->
@@ -90,13 +104,13 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th>MSSV</th>
-                  <th>Tên</th>
-                  <th>Môn</th>
-                  <th>Ngày</th>
-                  <th>Thời gian</th>
-                  <th>Trạng thái</th>
-                  <th>Chỉnh sửa</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">MSSV</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Tên</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Môn</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Ngày</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Thời gian</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Trạng thái</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Chỉnh sửa</th>
                 </tr>
               </thead>
               <tbody>
@@ -122,11 +136,11 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th>Mã giảng viên</th>
-                  <th>Họ tên</th>
-                  <th>Email</th>
-                  <th>SĐT</th>
-                  <th>Chỉnh sửa</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Mã giảng viên</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Họ tên</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Email</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">SĐT</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Chỉnh sửa</th>
                 </tr>
               </thead>
                 <tbody>
@@ -155,14 +169,14 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th>Ảnh</th>
-                  <th>Họ tên</th>
-                  <th>Email</th>
-                  <th>Ngày sinh</th>
-                  <th>MSSV</th>
-                  <th>Lớp</th>
-                  <th>Khoa</th>
-                  <th>Chỉnh sửa</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Ảnh</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Họ tên</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Email</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Ngày sinh</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">MSSV</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Lớp</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Khoa</th>
+                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Chỉnh sửa</th>
                 </tr>
               </thead>
               <tbody>
@@ -475,7 +489,7 @@ async function saveLecturer() {
     closeLecturerForm();
   } catch (err) {
     console.error('❌ Lỗi khi lưu giảng viên:', err.response?.data || err.message);
-    alert('❌ Không thể lưu giảng viên. Xem console để biết thêm chi tiết.');
+    alert('❌ Không thể lưu giảng viên.');
   }
 }
 async function deleteLecturer(id){
@@ -532,7 +546,15 @@ function deleteStudent(i){ if(confirm('Xóa sinh viên này?')) students.value.s
 // MODALS & FORM - Lịch thi
 // =============================
 const showScheduleModal = ref(false)
-const scheduleForm = reactive({ Mon_Hoc:'', Ngay_Thi:'', Gio_Bat_Dau:'', Gio_Ket_Thuc:'', Ghi_Chu:''})
+const scheduleForm = reactive({ STT : '',
+      Thu: '',
+      Ngay_Thi: '',
+      Gio_Bat_Dau: '', 
+      Mon_Hoc: '', 
+      So_Phong: '',
+      DSSV: '',
+      DSGV: '', 
+      Ghi_Chu: '' })
 const scheduleEditingIndex = ref(null)
 
 function openScheduleForm(item = null, idx = null) {
@@ -541,11 +563,14 @@ function openScheduleForm(item = null, idx = null) {
     scheduleEditingIndex.value = idx;
   } else { 
     Object.assign(scheduleForm, { 
-      id: '', 
-      Mon_Hoc: '', 
-      Ngay_Thi: '', 
+      STT : '',
+      Thu: '',
+      Ngay_Thi: '',
       Gio_Bat_Dau: '', 
-      Gio_Ket_Thuc: '', 
+      Mon_Hoc: '', 
+      So_Phong: '',
+      DSSV: '',
+      DSGV: '', 
       Ghi_Chu: '' 
     });
     scheduleEditingIndex.value = null;
@@ -689,7 +714,7 @@ init()
 .actions button,.actions .file-btn{background:#2ea44f;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;margin-left:8px}
 .file-btn input{display:none}
 .table{width:100%;border-collapse:collapse;margin-top:8px}
-.table th{background:#f6f8f9;text-align:left;padding:12px;border-bottom:1px solid #eee;color:#2b5f86}
+.table th{background:#f6f8f9;text-align:center;padding:12px;border-bottom:1px solid #eee;color:#2b5f86}
 .table td{padding:12px;border-bottom:1px solid #f1f4f5}
 .actions-cell button{margin-right:6px;padding:6px 8px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer}
 .empty{text-align:center;padding:18px;color:#777}
