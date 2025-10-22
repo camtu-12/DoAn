@@ -14,16 +14,16 @@
       <aside class="sidebar">
         <nav>
           <ul>
-            <li :class="{active: activePage==='home'}" @click="activePage='home'">Trang chủ</li>
-            <li :class="{active: activePage==='schedule'}" @click="activePage='schedule'">Lịch gác thi & Phòng gác thi</li>
-            <li :class="{active: activePage==='attendance'}" @click="activePage='attendance'">Kết quả điểm danh</li>
-            <li :class="{active: activePage==='lecturers'}" @click="activePage='lecturers'">Quản lí giảng viên</li>
-            <li :class="{active: activePage==='students'}" @click="activePage='students'">Quản lí sinh viên</li>
-            <li :class="{active: activePage==='password'}" @click="activePage='password'">Đổi mật khẩu</li>
+      <li :class="{active: activePage==='home'}" @click="setActivePage('home')">Trang chủ</li>
+      <li :class="{active: activePage==='schedule'}" @click="setActivePage('schedule')">Lịch gác thi & Phòng gác thi</li>
+      <li :class="{active: activePage==='attendance'}" @click="setActivePage('attendance')">Kết quả điểm danh</li>
+      <li :class="{active: activePage==='lecturers'}" @click="setActivePage('lecturers')">Quản lí giảng viên</li>
+      <li :class="{active: activePage==='students'}" @click="setActivePage('students')">Quản lí sinh viên</li>
+      <li :class="{active: activePage==='password'}" @click="setActivePage('password')">Đổi mật khẩu</li>
           </ul>
         </nav>
       </aside>
-
+      
       <main class="content">
         <section class="card">
           <h2 class="card-title">{{ pageTitle }}</h2>
@@ -47,7 +47,6 @@
                 </label>
               </div>
             </div>
-
           <table class="table">
             <thead>
               <tr>
@@ -217,22 +216,84 @@
 
    
 
-    <!-- FORMS / MODALS cua lich thi -->
-    <div v-if="showScheduleModal" class="modal">
-      <div class="modal-card wide">
-        <h3>{{ scheduleEditingIndex === null ? 'Thêm lịch thi' : 'Sửa lịch thi' }}</h3>
-        <div class="form-grid">
-          <div class="form-row"><label>Mã giảng viên</label><input v-model="scheduleForm.lecturerCode" /></div>
-          <div class="form-row"><label>Mã môn</label><input v-model="scheduleForm.S_id" /></div>
-          <div class="form-row"><label>Môn thi</label><input v-model="scheduleForm.Mon_Hoc" /></div>
-          <div class="form-row"><label>Ngày</label><input type="date" v-model="scheduleForm.Ngay_Thi" /></div>
-          <div class="form-row"><label>Giờ bắt đầu</label><input type="time" v-model="scheduleForm.Gio_Bat_Dau" /></div>
-          <div class="form-row"><label>Giờ kết thúc</label><input type="time" v-model="scheduleForm.Gio_Ket_Thuc" /></div>
-          <div class="form-row full"><label>Ghi chú</label><input v-model="scheduleForm.Ghi_Chu" /></div>
-        </div>
-        <div class="form-row actions"><button @click="saveSchedule">Lưu</button><button @click="closeScheduleForm">Hủy</button></div>
+    <!-- FORM / MODAL LỊCH THI -->
+<div v-if="showScheduleModal" class="modal">
+  <div class="modal-card wide">
+    <h3>{{ scheduleEditingIndex === null ? 'Thêm lịch thi' : 'Sửa lịch thi' }}</h3>
+    <div class="form-grid">
+
+      <div class="form-row">
+        <label>Thứ</label>
+        <select v-model="scheduleForm.Thu">
+          <option value="Thứ 2">Thứ 2</option>
+          <option value="Thứ 3">Thứ 3</option>
+          <option value="Thứ 4">Thứ 4</option>
+          <option value="Thứ 5">Thứ 5</option>
+          <option value="Thứ 6">Thứ 6</option>
+          <option value="Thứ 7">Thứ 7</option>
+          <option value="Chủ nhật">Chủ nhật</option>
+        </select>
       </div>
+
+      <div class="form-row">
+        <label>Ngày thi</label>
+        <input type="date" v-model="scheduleForm.Ngay_Thi" />
+      </div>
+
+      <div class="form-row">
+        <label>Giờ bắt đầu</label>
+        <input type="time" v-model="scheduleForm.Gio_Bat_Dau" />
+      </div>
+
+      <div class="form-row">
+        <label>Giờ kết thúc</label>
+        <input type="time" v-model="scheduleForm.Gio_Ket_Thuc" />
+      </div>
+
+      <div class="form-row">
+        <label>Môn học</label>
+        <input v-model="scheduleForm.Mon_Hoc" placeholder="Nhập tên môn học" />
+      </div>
+
+      <div class="form-row">
+        <label>Mã môn</label>
+        <input v-model="scheduleForm.S_id" placeholder="Mã môn học" />
+      </div>
+
+      <div class="form-row">
+        <label>Mã giảng viên</label>
+        <input v-model="scheduleForm.lecturerCode" placeholder="Mã giảng viên" />
+      </div>
+
+      <div class="form-row">
+        <label>Số phòng</label>
+        <input v-model="scheduleForm.So_Phong" placeholder="Nhập số phòng" />
+      </div>
+
+      <div class="form-row full">
+        <label>Danh sách sinh viên</label>
+        <textarea v-model="scheduleForm.DSSV" placeholder="Nhập danh sách sinh viên (phân cách bằng dấu phẩy)"></textarea>
+      </div>
+
+      <div class="form-row full">
+        <label>Danh sách giảng viên</label>
+        <textarea v-model="scheduleForm.DSGV" placeholder="Nhập danh sách giảng viên (phân cách bằng dấu phẩy)"></textarea>
+      </div>
+
+      <div class="form-row full">
+        <label>Ghi chú</label>
+        <textarea v-model="scheduleForm.Ghi_Chu" placeholder="Thêm ghi chú (nếu có)"></textarea>
+      </div>
+
     </div>
+
+    <div class="form-row actions">
+      <button @click="saveSchedule" class="bg-blue-500 text-white px-3 py-1 rounded mr-2">Lưu</button>
+      <button @click="closeScheduleForm" class="bg-gray-400 text-white px-3 py-1 rounded">Hủy</button>
+    </div>
+  </div>
+</div>
+
     <!-- FORMS / MODALS cua diem danh sinh vien-->
     <div v-if="showAttendanceModal" class="modal">
       <div class="modal-card">
@@ -340,14 +401,18 @@ import { router } from '@inertiajs/vue3'
 axios.defaults.withCredentials = true
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 
-// const activePage = ref('home')
 const activePage = ref('home')
+
+function setActivePage(p){
+  console.log('nav click ->', p)
+  activePage.value = p
+}
+
 const pageTitle = computed(() => {
   switch (activePage.value) {
     case 'home': return 'TRANG CHỦ'
     case 'schedule': return 'LỊCH GÁC THI & PHÒNG GÁC THI'
     case 'attendance': return 'KẾT QUẢ ĐIỂM DANH'
-
     case 'lecturers': return 'QUẢN LÍ GIẢNG VIÊN'
     case 'students': return 'QUẢN LÍ SINH VIÊN'
     default: return ''
@@ -361,6 +426,24 @@ const lecturers = ref([])
 const students = ref([])
 const schedules = ref([])
 const attendance = ref([])
+
+function formatDate(dateString) {
+  // Nếu rỗng hoặc null thì trả về chuỗi rỗng
+  if (!dateString) return ''
+
+  // Tạo đối tượng ngày
+  const date = new Date(dateString)
+
+  // Kiểm tra nếu không hợp lệ
+  if (isNaN(date)) return dateString
+
+  // Trả về định dạng ngày kiểu Việt Nam (VD: 22/10/2025)
+  return date.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })
+}
 
 // fetch functions from server
 const fetchLecturers = async () => {
@@ -417,8 +500,8 @@ async function saveSchedule() {
       alert('✅ Cập nhật lịch thi thành công!');
     }
 
-    await fetchLecturers();
-    closeLecturerForm();
+    await fetchSchedules();
+    closeScheduleForm();
   } catch (err) {
     console.error('❌ Lỗi khi lưu lịch thi:', err.response?.data || err.message);
     alert('❌ Không thể lưu lịch thi');
@@ -546,16 +629,10 @@ function deleteStudent(i){ if(confirm('Xóa sinh viên này?')) students.value.s
 // MODALS & FORM - Lịch thi
 // =============================
 const showScheduleModal = ref(false)
-const scheduleForm = reactive({ STT : '',
-      Thu: '',
-      Ngay_Thi: '',
-      Gio_Bat_Dau: '', 
-      Mon_Hoc: '', 
-      So_Phong: '',
-      DSSV: '',
-      DSGV: '', 
-      Ghi_Chu: '' })
+const scheduleForm = reactive({ STT : '', Thu: '',  Ngay_Thi: '',   Gio_Bat_Dau: '',    Mon_Hoc: '',  So_Phong: '',  DSSV: '', DSGV: '',  Ghi_Chu: ''})
 const scheduleEditingIndex = ref(null)
+
+
 
 function openScheduleForm(item = null, idx = null) {
   if (item) { 
