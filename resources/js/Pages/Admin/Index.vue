@@ -246,11 +246,6 @@
       </div>
 
       <div class="form-row">
-        <label>Giờ kết thúc</label>
-        <input type="time" v-model="scheduleForm.Gio_Ket_Thuc" />
-      </div>
-
-      <div class="form-row">
         <label>Môn học</label>
         <input v-model="scheduleForm.Mon_Hoc" placeholder="Nhập tên môn học" />
       </div>
@@ -496,7 +491,7 @@ async function saveSchedule() {
       alert('✅ Thêm lịch thi thành công!');
     } else {
       // ✏️ Cập nhật
-      await axios.put(`/schedules/update/${id}`, scheduleForm);
+      await axios.put(`/schedules/update/${i}`, scheduleForm);
       alert('✅ Cập nhật lịch thi thành công!');
     }
 
