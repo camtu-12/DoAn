@@ -66,7 +66,7 @@
             <tbody>
               <tr
                 v-for="(item, index) in schedules"
-                :key="item.id"
+                :key="item.STT || item.id || index"
                 class="hover:bg-gray-50"
               >
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ index + 1 }}</td>
@@ -484,14 +484,15 @@ const fetchSchedules = async () => {
 
 
 async function saveSchedule() {
-   try {
+  try {
     if (scheduleEditingIndex.value === null) {
-      // ➕ Thêm mới
+      // Thêm mới
       await axios.post('/schedules/add', scheduleForm);
       alert('✅ Thêm lịch thi thành công!');
     } else {
-      // ✏️ Cập nhật
-      await axios.put(`/schedules/update/${i}`, scheduleForm);
+      // Cập nhật: dùng STT (hoặc id) làm identifier
+      const id = scheduleForm.STT || scheduleForm.id || scheduleEditingIndex.value;
+      await axios.put(`/schedules/update/${id}`, scheduleForm);
       alert('✅ Cập nhật lịch thi thành công!');
     }
 
