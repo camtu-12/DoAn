@@ -68,6 +68,7 @@
                 v-for="(item, index) in schedules"
                 :key="item.id"
                 class="hover:bg-gray-50"
+                @click="console.log('🧩 item in v-for:', JSON.parse(JSON.stringify(item)))"
               >
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ index + 1 }}</td>
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ item.Thu }}</td>
@@ -496,7 +497,7 @@ async function saveSchedule() {
       alert('✅ Thêm lịch thi thành công!');
     } else {
       // ✏️ Cập nhật
-      await axios.put(`/schedules/update/${id}`, scheduleForm);
+      await axios.put(`/schedules/update/${scheduleForm.id}`, scheduleForm);
       alert('✅ Cập nhật lịch thi thành công!');
     }
 
@@ -638,8 +639,10 @@ function openScheduleForm(item = null, idx = null) {
   if (item) { 
     Object.assign(scheduleForm, item); 
     scheduleEditingIndex.value = idx;
+     console.log('🧩 scheduleForm.id =', scheduleForm.id);
   } else { 
     Object.assign(scheduleForm, { 
+      id: null,
       STT : '',
       Thu: '',
       Ngay_Thi: '',

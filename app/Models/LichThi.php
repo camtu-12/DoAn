@@ -16,13 +16,8 @@ class LichThi extends Model
     protected $table = 'lich_this';
 
     protected $fillable = [
-        'id',
-        'Mon_Hoc',
-        'Ngay_Thi',
-        'Gio_Bat_Dau',
-        'Gio_Ket_Thuc',
-        'So_Phong',
-        'Ghi_Chu',      // nếu bạn thêm cột Email liên kết giảng viên
+        'Thu', 'Ngay_Thi', 'Gio_Bat_Dau', 'Mon_Hoc',
+        'So_Phong', 'DSSV', 'DSGV', 'Ghi_Chu'
     ];
 
     protected $dates = [
