@@ -82,7 +82,7 @@
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ formatDate(item.updated_at) }}</td>
                 <td class="border border-gray-300 px-2 py-1 text-center">
                   <button @click="openScheduleForm(item, index)" class="bg-blue-500 text-white px-2 py-1 rounded mr-1">Sửa</button>
-                  <button @click="deleteSchedule(item.id)" class="bg-red-500 text-white px-2 py-1 rounded">Xóa</button>
+                  <button @click="deleteSchedule(item.STT || item.id)" class="bg-red-500 text-white px-2 py-1 rounded">Xóa</button>
                 </td>
               </tr>
 
@@ -653,14 +653,18 @@ function openScheduleForm(item = null, idx = null) {
 function closeScheduleForm(){ showScheduleModal.value = false }
 
 async function deleteSchedule(id) {
+  if (!id) {
+    alert('Không xác định id lịch thi để xóa.');
+    return;
+  }
   if (!confirm('Bạn có chắc chắn muốn xóa lịch thi này không?')) return;
-
   try {
-    await axios.delete(`/schedules/delete/${id}`);
-    await fetchSchedules(); // ✅ gọi hàm thật sự
+    await axios.delete(`/schedules/delete/${encodeURIComponent(id)}`);
+    await fetchSchedules();
     alert('✅ Xóa lịch thi thành công!');
   } catch (err) {
     console.error('❌ Lỗi khi xóa lịch thi:', err.response?.data || err.message);
+    alert('❌ Xóa thất bại: ' + (err.response?.data?.message || err.message));
   }
 }
 
