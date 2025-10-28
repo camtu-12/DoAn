@@ -104,4 +104,36 @@ public function updateStudent(Request $request, $id) {
         $gv->update($request->all());
         return response()->json($gv, 200);
     }  
+    /**
+     * Xóa sinh viên bởi id (dùng bởi frontend Admin)
+     */
+    public function deleteStudent($id)
+    {
+        // Nếu $id là số (primary key), thử find theo PK
+        $sv = null;
+        if (is_numeric($id)) {
+            $sv = SinhVien::find($id);
+        }
+
+        // Nếu chưa tìm được, thử dò theo các cột MSSV/Mssv/mssv phổ biến
+        if (! $sv) {
+            $sv = SinhVien::where('Mssv', $id)
+                ->orWhere('MSSV', $id)
+                ->orWhere('mssv', $id)
+                ->orWhere('MSSV', '=', $id) // defensive duplicate won't hurt
+                ->first();
+        }
+
+        if (! $sv) {
+            return response()->json(['message' => 'Không tìm thấy sinh viên'], 404);
+        }
+
+        try {
+            $sv->delete();
+            return response()->json(['message' => 'Đã xóa sinh viên'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Xóa thất bại', 'error' => $e->getMessage()], 500);
+        }
+    }
+
 }

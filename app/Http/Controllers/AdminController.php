@@ -42,7 +42,7 @@ class AdminController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(admin $admin)
+    public function show($admin)
     {
         //
     }
@@ -50,7 +50,7 @@ class AdminController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(admin $admin)
+    public function edit($admin)
     {
         //
     }
@@ -58,7 +58,7 @@ class AdminController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, admin $admin)
+    public function update(Request $request, $admin)
     {
         //
     }
@@ -66,7 +66,7 @@ class AdminController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(admin $admin)
+    public function destroy($admin)
     {
         //
     }
@@ -180,5 +180,6 @@ public function getSchedule($id)
     return response()->json($schedule, 200);
 }
 
+    
 
 }

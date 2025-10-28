@@ -619,7 +619,25 @@ function saveStudent(){
   else students.value[studentEditingIndex.value] = {...studentForm}
   closeStudentForm()
 }
-function deleteStudent(i){ if(confirm('Xóa sinh viên này?')) students.value.splice(i,1) }
+async function deleteStudent(i){
+  const s = students.value[i]
+  if(!s){ alert('Không tìm thấy sinh viên để xóa'); return }
+  if(!confirm('Bạn có chắc chắn muốn xóa sinh viên này?')) return;
+  try{
+    // dùng route mới: DELETE /students/delete/{id}
+    const id = s.id || s.Mssv || s.mssv
+    await axios.delete(`/students/delete/${encodeURIComponent(id)}`)
+    await fetchStudents()
+    alert('✅ Xóa sinh viên thành công!')
+  }catch(err){
+    console.error('❌ Lỗi khi xóa sinh viên:', err.response?.data || err.message)
+    // Hiển thị chi tiết lỗi từ server nếu có
+    const serverData = err.response?.data
+    let msg = serverData?.message || err.message || 'Xóa thất bại'
+    if (serverData?.error) msg += ': ' + serverData.error
+    alert('❌ Xóa sinh viên thất bại: ' + msg)
+  }
+}
 
 // =============================
 // MODALS & FORM - Lịch thi
