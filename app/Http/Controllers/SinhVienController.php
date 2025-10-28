@@ -96,14 +96,7 @@ public function examSchedule() {
     ]);
 }
 
-public function updateStudent(Request $request, $id) {
-        $gv = SinhVien::find($id);
-        if (!$gv) {
-            return response()->json(['message' => 'Sinh viên không tồn tại'], 404);
-        }
-        $gv->update($request->all());
-        return response()->json($gv, 200);
-    }  
+  
     /**
      * Xóa sinh viên bởi id (dùng bởi frontend Admin)
      */
@@ -135,5 +128,57 @@ public function updateStudent(Request $request, $id) {
             return response()->json(['message' => 'Xóa thất bại', 'error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+         * Thêm sinh viên mới (từ Admin UI)
+         */
+        public function addStudent(Request $request)
+        {
+            $data = $request->validate([
+                'Ho_va_ten' => 'required|string',
+                'Email' => 'nullable|email',
+                'Ngay_Sinh' => 'nullable|date',
+                'Mssv' => 'required|string|unique:sinhviens,Mssv',
+                'Lop' => 'nullable|string',
+                'Khoa' => 'nullable|string',
+                'Photo' => 'nullable|string',
+            ]);
+
+            try {
+                $sv = SinhVien::create($data);
+                return response()->json($sv, 201);
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Tạo sinh viên thất bại', 'error' => $e->getMessage()], 500);
+            }
+        }
+
+        /**
+         * Cập nhật sinh viên (tìm theo khóa chính Mssv)
+         */
+        public function updateStudent(Request $request, $id)
+        {
+            // vì model đã thiết lập primaryKey = Mssv nên find sẽ tìm theo Mssv
+            $sv = SinhVien::find($id);
+            if (! $sv) {
+                return response()->json(['message' => 'Không tìm thấy sinh viên'], 404);
+            }
+
+            $data = $request->validate([
+                'Ho_va_ten' => 'sometimes|string',
+                'Email' => 'sometimes|nullable|email',
+                'Ngay_Sinh' => 'sometimes|nullable|date',
+                'Mssv' => 'sometimes|string|unique:sinhviens,Mssv,'.$id.',Mssv',
+                'Lop' => 'sometimes|nullable|string',
+                'Khoa' => 'sometimes|nullable|string',
+                'Photo' => 'sometimes|nullable|string',
+            ]);
+
+            try {
+                $sv->update($data);
+                return response()->json($sv, 200);
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Cập nhật thất bại', 'error' => $e->getMessage()], 500);
+            }
+        }
 
 }

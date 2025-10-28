@@ -614,10 +614,45 @@ function onStudentPhoto(e){
   reader.onload = ev => studentForm.Photo = ev.target.result
   reader.readAsDataURL(f)
 }
-function saveStudent(){
-  if(studentEditingIndex.value===null) students.value.push({...studentForm})
-  else students.value[studentEditingIndex.value] = {...studentForm}
-  closeStudentForm()
+async function saveStudent(){
+  try {
+    if (studentEditingIndex.value === null) {
+      // Thêm mới
+      await axios.post('/students/add', {
+        Ho_va_ten: studentForm.Ho_va_ten,
+        Email: studentForm.Email,
+        Ngay_Sinh: studentForm.Ngay_Sinh,
+        Mssv: studentForm.Mssv,
+        Lop: studentForm.Lop,
+        Khoa: studentForm.Khoa,
+        Photo: studentForm.Photo || null,
+      })
+      alert('✅ Thêm sinh viên thành công!')
+    } else {
+      // Cập nhật
+      const id = studentForm.Mssv
+      if (!id) return alert('Không có MSSV để cập nhật')
+      await axios.put(`/students/update/${encodeURIComponent(id)}`, {
+        Ho_va_ten: studentForm.Ho_va_ten,
+        Email: studentForm.Email,
+        Ngay_Sinh: studentForm.Ngay_Sinh,
+        Mssv: studentForm.Mssv,
+        Lop: studentForm.Lop,
+        Khoa: studentForm.Khoa,
+        Photo: studentForm.Photo || null,
+      })
+      alert('✅ Cập nhật sinh viên thành công!')
+    }
+
+    await fetchStudents()
+    closeStudentForm()
+  } catch (err) {
+    console.error('❌ Lỗi khi lưu sinh viên:', err.response?.data || err.message)
+    const serverData = err.response?.data
+    let msg = serverData?.message || err.message || 'Lưu thất bại'
+    if (serverData?.error) msg += ': ' + serverData.error
+    alert('❌ Không thể lưu sinh viên: ' + msg)
+  }
 }
 async function deleteStudent(i){
   const s = students.value[i]

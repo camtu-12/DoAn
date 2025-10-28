@@ -139,6 +139,10 @@ Route::get('/lecturers', [AdminController::class, 'getLecturers']);
 Route::get('/students', [AdminController::class, 'getStudents']);
 Route::get('/schedules', [AdminController::class, 'getSchedules']); //lich thi phan cong
 
+// Thêm / Sửa sinh viên (dùng bởi frontend Admin)
+Route::post('/students/add', [AdminController::class, 'addStudent'])->middleware(['auth','verified']);
+Route::put('/students/update/{id}', [AdminController::class, 'updateStudent'])->middleware(['auth','verified']);
+
 
 
 
