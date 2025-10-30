@@ -183,7 +183,7 @@
                   <td class="avatar-cell"><img :src="s.photo || placeholder" /></td>
                   <td>{{ s.Ho_va_ten }}</td>
                   <td>{{ s.Email }}</td>
-                  <td>{{ s.Ngay_Sinh}}</td>
+                  <td>{{ formatDate(s.Ngay_Sinh) }}</td>
                   <td>{{ s.Mssv }}</td>
                   <td>{{ s.Lop }}</td>
                   <td>{{ s.Khoa }}</td>
@@ -353,7 +353,7 @@
             </div>
             <div class="form-row">
               <label>Ngày sinh</label>
-              <input v-model="studentForm.Ngay_Sinh" />
+              <input type="date" v-model="studentForm.Ngay_Sinh" />
             </div>
             <div class="form-row">
               <label>MSSV</label>
