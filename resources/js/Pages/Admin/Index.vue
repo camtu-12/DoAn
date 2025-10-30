@@ -75,7 +75,10 @@
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ item.Gio_Bat_Dau }}</td>
                 <td class="border border-gray-300 px-2 py-1">{{ item.Mon_Hoc }}</td>
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ item.So_Phong }}</td>
-                <td class="border border-gray-300 px-2 py-1">{{ item.DSSV }}</td>
+                <td class="border border-gray-300 px-2 py-1">
+                  {{ Array.isArray(item.DSSV) ? item.DSSV.length : (item.DSSV ? item.DSSV.split(',').length : 0) }} sinh viên
+                  <button @click="showStudentList(item.DSSV)" style="margin-left:8px; color:#0d6efd; background:none; border:none; cursor:pointer; text-decoration:underline;">Xem chi tiết</button>
+                </td>
                 <td class="border border-gray-300 px-2 py-1">{{ item.DSGV }}</td>
                 <td class="border border-gray-300 px-2 py-1">{{ item.Ghi_Chu }}</td>
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ formatDate(item.created_at) }}</td>
@@ -381,9 +384,36 @@
           </div>
         </div>
 
-
-
-
+    <!-- Modal hiển thị danh sách sinh viên chi tiết -->
+    <div v-if="showStudentListModal" class="modal">
+      <div class="modal-card wide">
+        <h3>Danh sách sinh viên</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>MSSV</th>
+              <th>Họ và tên</th>
+              <th>Ngày sinh</th>
+              <th>Lớp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="sv in studentListDetail" :key="sv.Mssv">
+              <td>{{ sv.Mssv }}</td>
+              <td>{{ sv.Ho_va_ten }}</td>
+              <td>{{ formatDate(sv.Ngay_Sinh) }}</td>
+              <td>{{ sv.Lop }}</td>
+            </tr>
+            <tr v-if="studentListDetail.length === 0">
+              <td colspan="4" class="empty">Không có dữ liệu</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="form-row actions">
+          <button @click="showStudentListModal = false">Đóng</button>
+        </div>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -797,6 +827,22 @@ const init = ()=>{
   }catch(e){ console.warn('load fail', e) }
 }
 init()
+
+const showStudentListModal = ref(false)
+const studentListDetail = ref([])
+
+function showStudentList(dssvRaw) {
+  // dssvRaw có thể là chuỗi mã số, hoặc mảng
+  let mssvArr = []
+  if (Array.isArray(dssvRaw)) {
+    mssvArr = dssvRaw
+  } else if (typeof dssvRaw === 'string') {
+    mssvArr = dssvRaw.split(',').map(s => s.trim()).filter(Boolean)
+  }
+  // Lấy thông tin sinh viên từ students
+  studentListDetail.value = students.value.filter(sv => mssvArr.includes(sv.Mssv))
+  showStudentListModal.value = true
+}
 </script>
 
 
