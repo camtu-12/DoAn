@@ -79,7 +79,10 @@
                   {{ Array.isArray(item.DSSV) ? item.DSSV.length : (item.DSSV ? item.DSSV.split(',').length : 0) }} sinh viên
                   <button @click="showStudentList(item.DSSV)" style="margin-left:8px; color:#0d6efd; background:none; border:none; cursor:pointer; text-decoration:underline;">Xem chi tiết</button>
                 </td>
-                <td class="border border-gray-300 px-2 py-1">{{ item.DSGV }}</td>
+                <td class="border border-gray-300 px-2 py-1">
+                  {{ Array.isArray(item.DSGV) ? item.DSGV.length : (item.DSGV ? item.DSGV.split(',').length : 0) }} giảng viên
+                  <button @click="showLecturerList(item.DSGV)" style="margin-left:8px; color:#0d6efd; background:none; border:none; cursor:pointer; text-decoration:underline;">Xem chi tiết</button>
+                </td>
                 <td class="border border-gray-300 px-2 py-1">{{ item.Ghi_Chu }}</td>
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ formatDate(item.created_at) }}</td>
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ formatDate(item.updated_at) }}</td>
@@ -254,16 +257,6 @@
       </div>
 
       <div class="form-row">
-        <label>Mã môn</label>
-        <input v-model="scheduleForm.S_id" placeholder="Mã môn học" />
-      </div>
-
-      <div class="form-row">
-        <label>Mã giảng viên</label>
-        <input v-model="scheduleForm.lecturerCode" placeholder="Mã giảng viên" />
-      </div>
-
-      <div class="form-row">
         <label>Số phòng</label>
         <input v-model="scheduleForm.So_Phong" placeholder="Nhập số phòng" />
       </div>
@@ -411,6 +404,33 @@
         </table>
         <div class="form-row actions">
           <button @click="showStudentListModal = false">Đóng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal hiển thị danh sách giảng viên chi tiết -->
+    <div v-if="showLecturerListModal" class="modal">
+      <div class="modal-card wide">
+        <h3>Danh sách giảng viên</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Mã giảng viên</th>
+              <th>Họ và tên</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="gv in lecturerListDetail" :key="gv.MaGV">
+              <td>{{ gv.MaGV }}</td>
+              <td>{{ gv.Ho_va_Ten }}</td>
+            </tr>
+            <tr v-if="lecturerListDetail.length === 0">
+              <td colspan="2" class="empty">Không có dữ liệu</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="form-row actions">
+          <button @click="showLecturerListModal = false">Đóng</button>
         </div>
       </div>
     </div>
@@ -843,6 +863,20 @@ function showStudentList(dssvRaw) {
   studentListDetail.value = students.value.filter(sv => mssvArr.includes(sv.Mssv))
   showStudentListModal.value = true
 }
+
+const showLecturerListModal = ref(false)
+const lecturerListDetail = ref([])
+
+function showLecturerList(dsgvRaw) {
+  let magvArr = []
+  if (Array.isArray(dsgvRaw)) {
+    magvArr = dsgvRaw
+  } else if (typeof dsgvRaw === 'string') {
+    magvArr = dsgvRaw.split(',').map(s => s.trim()).filter(Boolean)
+  }
+  lecturerListDetail.value = lecturers.value.filter(gv => magvArr.includes(gv.MaGV))
+  showLecturerListModal.value = true
+}
 </script>
 
 
@@ -997,5 +1031,66 @@ button {
 }
 .toolbar button:hover {
   background-color: #0b5ed7;
+}
+</style>
+
+<style scoped>
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    min-height: unset;
+    padding-top: 0;
+    order: 2;
+  }
+  .content {
+    padding: 16px 4px;
+  }
+  .card {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .header h1, .ppp {
+    font-size: 18px !important;
+    margin-left: 4px;
+  }
+  .sidebar nav li {
+    padding: 10px 8px;
+    font-size: 15px;
+  }
+  .card-title {
+    font-size: 18px;
+  }
+  .table, .table th, .table td {
+    font-size: 13px;
+    padding: 6px 2px;
+  }
+  .form-row label {
+    font-size: 14px;
+  }
+  .modal-card, .modal-card.wide {
+    min-width: 95vw;
+    padding: 6px;
+  }
+  .form-row input, .form-row select, .form-row textarea {
+    font-size: 14px;
+    padding: 6px;
+  }
+  .toolbar .search input {
+    width: 100%;
+    min-width: 0;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .avatar-cell img {
+    width: 32px;
+    height: 32px;
+  }
 }
 </style>
