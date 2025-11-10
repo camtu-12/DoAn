@@ -161,4 +161,5 @@ Route::put('/lecturers/update/{id}', [GiangVienController::class, 'updateLecture
 //chức năng thêm xóa sửa trong sinh viên
 Route::put('/sinhviens/update/{id}', [SinhVienController::class, 'updateStudent']);
 Route::delete('/students/delete/{id}', [SinhVienController::class, 'deleteStudent'])->middleware(['auth','verified']);
+Route::post('/students/delete-all', [SinhVienController::class, 'deleteAllStudents'])->middleware(['auth','verified']);
 

@@ -15,6 +15,6 @@ class SinhVien extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'Ho_va_ten', 'Email', 'Ngay_Sinh', 'Mssv', 'Lop', 'Khoa', 'Photo', 'KQDD'
+    'Mssv','Ho_va_ten', 'Ngay_Sinh', 'Lop', 'Khoa', 'Bac'
     ];
 }

@@ -170,29 +170,34 @@
           <div v-if="activePage==='students'" class="page-body">
             <div class="toolbar">
               <button @click="openStudentForm()">Thêm sinh viên</button>
+              <label class="excel-btn">
+                <input type="file" accept=".xlsx,.xls" @change="importStudentsFromExcel" style="display:none" />
+                Thêm sinh viên từ file Excel
+              </label>
+              <button @click="deleteAllStudents" class="delete-all-btn">Xóa tất cả sinh viên</button>
             </div>
             <table class="table">
               <thead>
                 <tr>
-                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Ảnh</th>
-                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Họ tên</th>
-                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Email</th>
-                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Ngày sinh</th>
-                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">MSSV</th>
-                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Lớp</th>
-                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Khoa</th>
-                  <th data-v-d31f6b30 class="border border-gray-300 px-2 py-1">Chỉnh sửa</th>
+                  <th>STT</th>
+                  <th>Mã số sinh viên</th>
+                  <th>Họ và tên</th>
+                  <th>Ngày sinh</th>
+                  <th>Lớp</th>
+                  <th>Khoa</th>
+                  <th>Bậc</th>
+                  <th>Chỉnh sửa</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(s, i) in students" :key="s.Mssv">
-                  <td class="avatar-cell"><img :src="s.photo || placeholder" /></td>
-                  <td>{{ s.Ho_va_ten }}</td>
-                  <td>{{ s.Email }}</td>
-                  <td>{{ formatDate(s.Ngay_Sinh) }}</td>
+                  <td>{{ i + 1 }}</td>
                   <td>{{ s.Mssv }}</td>
+                  <td>{{ s.Ho_va_ten }}</td>
+                  <td>{{ formatDate(s.Ngay_Sinh) }}</td>
                   <td>{{ s.Lop }}</td>
                   <td>{{ s.Khoa }}</td>
+                  <td>{{ s.Bac || 'Chưa có' }}</td>
                   <td class="actions-cell">
                     <button @click="openStudentForm(s, i)">Sửa</button>
                     <button @click="deleteStudent(i)">Xóa</button>
@@ -338,22 +343,17 @@
           <div v-if= "showStudentModal" class="modal">
           <div class="modal-card">
             <h3>{{ studentEditingIndex === null ? 'Thêm sinh viên' : 'Sửa sinh viên' }}</h3>
-        
             <div class="form-row">
-              <label>Họ tên</label>
-              <input v-model="studentForm.Ho_va_ten" />
+              <label>Mã số sinh viên</label>
+              <input v-model="studentForm.Mssv" />
             </div>
             <div class="form-row">
-              <label>Email</label>
-              <input v-model="studentForm.Email" />
+              <label>Họ và tên</label>
+              <input v-model="studentForm.Ho_va_ten" />
             </div>
             <div class="form-row">
               <label>Ngày sinh</label>
               <input type="date" v-model="studentForm.Ngay_Sinh" />
-            </div>
-            <div class="form-row">
-              <label>MSSV</label>
-              <input v-model="studentForm.Mssv" />
             </div>
             <div class="form-row">
               <label>Lớp</label>
@@ -364,11 +364,13 @@
               <input v-model="studentForm.Khoa" />  
             </div>
             <div class="form-row">
-              <label>Ảnh</label>
-              <input type="file" @change="handleFileUpload" />
-              <div v-if="previewImage">
-                <img :src="previewImage" alt="Preview" style="max-width: 200px; margin-top: 10px;" />
-              </div>
+              <label>Bậc</label>
+              <select v-model="studentForm.Bac">
+                <option value="">Chọn bậc đào tạo</option>
+                <option value="Đại học">Đại học</option>
+                <option value="Cao đẳng">Cao đẳng</option>
+                <option value="Liên thông">Liên thông</option>
+              </select>
             </div>
             <div class="form-row actions">
               <button @click="saveStudent">Lưu</button>
@@ -439,14 +441,48 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed, watch, onMounted } from 'vue'
+import { reactive, ref, computed, watch, onMounted, nextTick } from 'vue'
 import axios from 'axios' 
 import { router } from '@inertiajs/vue3'
+import * as XLSX from 'xlsx'
+
+// Khởi tạo các biến reactive
 
 axios.defaults.withCredentials = true
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 
 const activePage = ref('home')
+
+async function deleteAllStudents() {
+  if(!confirm('⚠️ CẢNH BÁO: Bạn có chắc chắn muốn xóa TẤT CẢ sinh viên? Hành động này không thể hoàn tác!')) return
+  try {
+    const response = await axios.post('/students/delete-all')
+    if (response.data.success) {
+      // Tạo một mảng mới để trigger reactivity
+      const newStudents = []
+      students.value = newStudents
+
+      // Xóa cache trong localStorage
+      localStorage.removeItem('students')
+      
+      // Force re-render bằng cách tạo một nextTick
+      await nextTick()
+      
+      // Double check với server
+      const checkResponse = await axios.get('/students')
+      if (Array.isArray(checkResponse.data)) {
+        students.value = [...checkResponse.data]
+      }
+      
+      alert('✅ Đã xóa tất cả sinh viên!')
+    } else {
+      throw new Error(response.data.message || 'Không thể xóa sinh viên')
+    }
+  } catch(err) {
+    console.error('❌ Lỗi khi xóa tất cả sinh viên:', err.response?.data || err.message)
+    alert('❌ Không thể xóa tất cả sinh viên: ' + (err.response?.data?.message || err.message))
+  }
+}
 
 function setActivePage(p){
   console.log('nav click ->', p)
@@ -471,6 +507,8 @@ const lecturers = ref([])
 const students = ref([])
 const schedules = ref([])
 const attendance = ref([])
+
+
 
 function formatDate(dateString) {
   // Nếu rỗng hoặc null thì trả về chuỗi rỗng
@@ -503,9 +541,20 @@ const fetchLecturers = async () => {
 const fetchStudents = async () => {
   try {
     const res = await axios.get('/students')
-    students.value = res.data || []
+    console.log('Fetched students data:', res.data); 
+    if (Array.isArray(res.data)) {
+      // Kiểm tra và đảm bảo mỗi sinh viên có trường Bac
+      students.value = res.data.map(student => ({
+        ...student,
+        Bac: student.Bac || student.bac || '' // Thử cả 2 cách viết hoa/thường
+      }));
+    } else {
+      console.error('Data from server is not an array:', res.data);
+      students.value = [];
+    }
   } catch (err) {
     console.error('fetchStudents failed', err.response?.status, err.response?.data || err.message)
+    students.value = [];
   }
 }
 
@@ -635,7 +684,7 @@ async function deleteLecturer(id){
 // MODALS & FORM - Sinh viên
 // =============================
 const showStudentModal = ref(false)
-const studentForm = reactive({ Ho_va_ten:'', Email:'', Ngay_Sinh:'', Mssv:'', Lop:'', Khoa:'', Photo:'', KQDD:''})
+const studentForm = reactive({ Mssv:'', Ho_va_ten:'', Ngay_Sinh:'', Lop:'', Khoa:'', Bac:'' })
 const studentEditingIndex = ref(null)
 
 
@@ -652,8 +701,20 @@ function handleFileUpload(event) {
 
 
 function openStudentForm(item=null, idx=null){
-  if(item){ Object.assign(studentForm, item); studentEditingIndex.value = idx }
-  else { Object.assign(studentForm, { Ho_va_ten:'', Email:'', Ngay_Sinh:'', Mssv:'', Lop:'', Khoa:'', Photo:'',KQDD:''}); studentEditingIndex.value = null }
+  if(item){
+    Object.assign(studentForm, {
+      Mssv: item.Mssv || '',
+      Ho_va_ten: item.Ho_va_ten || item.Hovaten || '',
+      Ngay_Sinh: item.Ngay_Sinh || '',
+      Lop: item.Lop || '',
+      Khoa: item.Khoa || '',
+      Bac: item.Bac || ''
+    });
+    studentEditingIndex.value = idx
+  } else {
+    Object.assign(studentForm, { Mssv:'', Ho_va_ten:'', Ngay_Sinh:'', Lop:'', Khoa:'', Bac:'' });
+    studentEditingIndex.value = null
+  }
   showStudentModal.value = true
 }
 function closeStudentForm(){ showStudentModal.value = false }
@@ -666,42 +727,43 @@ function onStudentPhoto(e){
 }
 async function saveStudent(){
   try {
-    if (studentEditingIndex.value === null) {
-      // Thêm mới
-      await axios.post('/students/add', {
-        Ho_va_ten: studentForm.Ho_va_ten,
-        Email: studentForm.Email,
-        Ngay_Sinh: studentForm.Ngay_Sinh,
-        Mssv: studentForm.Mssv,
-        Lop: studentForm.Lop,
-        Khoa: studentForm.Khoa,
-        Photo: studentForm.Photo || null,
-      })
-      alert('✅ Thêm sinh viên thành công!')
-    } else {
-      // Cập nhật
-      const id = studentForm.Mssv
-      if (!id) return alert('Không có MSSV để cập nhật')
-      await axios.put(`/students/update/${encodeURIComponent(id)}`, {
-        Ho_va_ten: studentForm.Ho_va_ten,
-        Email: studentForm.Email,
-        Ngay_Sinh: studentForm.Ngay_Sinh,
-        Mssv: studentForm.Mssv,
-        Lop: studentForm.Lop,
-        Khoa: studentForm.Khoa,
-        Photo: studentForm.Photo || null,
-      })
-      alert('✅ Cập nhật sinh viên thành công!')
+    // Validate bậc học
+    if (!studentForm.Bac) {
+      alert('❌ Vui lòng chọn bậc đào tạo');
+      return;
     }
 
-    await fetchStudents()
-    closeStudentForm()
+    const studentData = {
+      Mssv: studentForm.Mssv,
+      Ho_va_ten: studentForm.Ho_va_ten,
+      Ngay_Sinh: studentForm.Ngay_Sinh,
+      Lop: studentForm.Lop,
+      Khoa: studentForm.Khoa,
+      Bac: studentForm.Bac
+    };
+
+    console.log('Saving student data:', studentData); // Debug log
+
+    if (studentEditingIndex.value === null) {
+      // Thêm mới sinh viên
+      const response = await axios.post('/students/add', studentData);
+      console.log('Add response:', response.data); // Debug log
+      alert('✅ Thêm sinh viên thành công!');
+    } else {
+      // Cập nhật sinh viên
+      const s = students.value[studentEditingIndex.value];
+      if (!s) return alert('Không tìm thấy sinh viên để cập nhật');
+      const response = await axios.put(`/students/update/${studentForm.Mssv}`, studentData);
+      console.log('Update response:', response.data); // Debug log
+      alert('✅ Cập nhật sinh viên thành công!');
+    }
+    
+    // Tải lại danh sách sinh viên từ server
+    await fetchStudents();
+    closeStudentForm();
   } catch (err) {
-    console.error('❌ Lỗi khi lưu sinh viên:', err.response?.data || err.message)
-    const serverData = err.response?.data
-    let msg = serverData?.message || err.message || 'Lưu thất bại'
-    if (serverData?.error) msg += ': ' + serverData.error
-    alert('❌ Không thể lưu sinh viên: ' + msg)
+    console.error('Lỗi khi lưu sinh viên:', err.response?.data || err.message);
+    alert('❌ Không thể lưu sinh viên: ' + (err.response?.data?.message || err.message));
   }
 }
 async function deleteStudent(i){
@@ -723,6 +785,7 @@ async function deleteStudent(i){
     alert('❌ Xóa sinh viên thất bại: ' + msg)
   }
 }
+
 
 // =============================
 // MODALS & FORM - Lịch thi
@@ -824,10 +887,13 @@ function logout() {
 }
 
 // =============================
-// LOCALSTORAGE
+// LOCALSTORAGE & WATCHERS
 // =============================
 watch(lecturers, (v)=> localStorage.setItem('lecturers', JSON.stringify(v)), {deep:true})
-watch(students, (v)=> localStorage.setItem('students', JSON.stringify(v)), {deep:true})
+watch(students, (v)=> {
+  console.log('Students changed:', v); // Debug log
+  localStorage.setItem('students', JSON.stringify(v))
+}, {deep:true, immediate: true})
 watch(schedules, (v)=> localStorage.setItem('schedules', JSON.stringify(v)), {deep:true})
 watch(attendance, (v)=> localStorage.setItem('attendance', JSON.stringify(v)), {deep:true})
 
@@ -847,6 +913,8 @@ const init = ()=>{
   }catch(e){ console.warn('load fail', e) }
 }
 init()
+
+
 
 const showStudentListModal = ref(false)
 const studentListDetail = ref([])
@@ -876,6 +944,134 @@ function showLecturerList(dsgvRaw) {
   }
   lecturerListDetail.value = lecturers.value.filter(gv => magvArr.includes(gv.MaGV))
   showLecturerListModal.value = true
+}
+
+// =============================
+// NHẬP SINH VIÊN TỪ FILE EXCEL
+// =============================
+function importStudentsFromExcel(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = async (evt) => {
+    const data = new Uint8Array(evt.target.result)
+    const workbook = XLSX.read(data, { type: 'array' })
+    const sheetName = workbook.SheetNames[0]
+    const worksheet = workbook.Sheets[sheetName]
+    const json = XLSX.utils.sheet_to_json(worksheet, { defval: '', raw: false })
+    
+    // Debug: In ra tất cả tên cột từ file Excel
+    console.log('Tên các cột trong file Excel:', Object.keys(json[0] || {}))
+    
+    function normalize(str) {
+      // Chuyển về chữ thường và bỏ dấu
+      let result = String(str || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+      
+      // Xóa các ký tự đặc biệt và khoảng trắng
+      result = result.replace(/[^a-z0-9]/g, '');
+      
+      console.log(`Normalize: "${str}" -> "${result}"`)
+      return result;
+    }
+    const colMap = {
+      mssv: ['mssv','masosinhvien','masinhvien','masv','masosvien'],
+      hoten: ['hoten','hovaten','hotensinhvien','hotenhs','ten','hovaten','hoten'],
+      ngaysinh: ['ngaysinh','ngaysinh','ngaysinhsv','ngaysinhhs'],
+      lop: ['lop','malop','tenlop'],
+      khoa: ['khoa','tenkhoa','khoavien'],
+      bac: ['bac','bacdaotao','hedaotao','bac dao tao','he dao tao','bậc','bacdaotao','bậc đào tạo','hệ đào tạo','Bậc','Bac']
+    }
+    
+    // Debug: In ra kết quả mapping cho mỗi trường
+    console.log('=== DEBUG COLUMN MAPPING ===')
+    for (const field in colMap) {
+      console.log(`${field}:`, Object.keys(json[0] || {}).find(col => 
+        colMap[field].includes(col) || 
+        colMap[field].includes(normalize(col))
+      ))
+    }
+    function getKey(row, keys) {
+      for (const k of keys) {
+        for (const col in row) {
+          if (normalize(col) === k) return row[col]
+        }
+      }
+      return ''
+    }
+    let added = 0
+    let failed = 0
+    let errorMsgs = []
+    let newStudents = [] // Mảng chứa sinh viên mới để thêm vào database
+
+    for (const row of json) {
+      const mssv = getKey(row, colMap.mssv)
+      const hoten = getKey(row, colMap.hoten)
+      const ngaysinh = getKey(row, colMap.ngaysinh)
+      const lop = getKey(row, colMap.lop)
+      const khoa = getKey(row, colMap.khoa)
+      const bac = getKey(row, colMap.bac)
+      
+      if (!mssv || !hoten) continue
+      
+      // Chuyển đổi ngày sinh dd/mm/yyyy -> yyyy-mm-dd nếu cần
+      let ngaySinhDb = ngaysinh
+      if (ngaysinh && /^\d{2}\/\d{2}\/\d{4}$/.test(ngaysinh)) {
+        const [d, m, y] = ngaysinh.split('/')
+        ngaySinhDb = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`
+      }
+
+      // Debug: In ra dữ liệu trước khi tạo object student
+      console.log('Raw data for student:', {
+        mssv, hoten, ngaysinh, lop, khoa, bac
+      })
+      
+      const student = {
+        Mssv: mssv,
+        Ho_va_ten: hoten,
+        Email: null,
+        Ngay_Sinh: ngaySinhDb || null,
+        Lop: lop || null,
+        Khoa: khoa || null,
+        Bac: bac || null
+      }
+      
+      // Debug: In ra object student trước khi gửi lên server
+      console.log('Student object to save:', student)
+
+      try {
+        // Thêm sinh viên vào database
+        await axios.post('/students/add', student)
+        // Nếu thành công, thêm vào danh sách sinh viên hiển thị
+        students.value.push(student)
+        added++
+      } catch (err) {
+        failed++
+        let msg = err.response?.data?.message || err.message || 'Lỗi không xác định'
+        if (err.response?.data?.error) {
+          msg += ': ' + err.response.data.error
+        }
+        errorMsgs.push(`MSSV: ${student.Mssv} - ${msg}`)
+        console.error('Lỗi khi lưu sinh viên:', student, err.response?.data || err.message)
+      }
+    }
+
+    let alertMsg = ''
+    if (added > 0) {
+      alertMsg += `✅ Đã thêm thành công ${added} sinh viên vào database!\n`
+      await fetchStudents() // Cập nhật lại danh sách từ server
+    }
+    if (failed > 0) {
+      alertMsg += `❌ ${failed} sinh viên lỗi không lưu được:\n` + errorMsgs.join('\n')
+    }
+    if (!alertMsg) {
+      alertMsg = '❌ Không thêm được sinh viên nào vào database. Kiểm tra lại tên cột và dữ liệu file Excel!'
+    }
+    alert(alertMsg)
+  }
+  reader.readAsArrayBuffer(file)
 }
 </script>
 
@@ -1031,6 +1227,35 @@ button {
 }
 .toolbar button:hover {
   background-color: #0b5ed7;
+}
+
+.excel-btn {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 8px;
+  font-weight: 600;
+  display: inline-block;
+  transition: background 0.2s;
+}
+.excel-btn:hover {
+  background: #218838;
+}
+.excel-btn input[type='file'] {
+  display: none;
+}
+
+.delete-all-btn {
+  background-color: #dc3545;
+  color: white;
+  margin-left: 8px;
+}
+
+.delete-all-btn:hover {
+  background-color: #c82333;
 }
 </style>
 

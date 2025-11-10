@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sinhviens', function (Blueprint $table) {
-            
             $table->string('Ho_va_ten', 120);
-            $table->string('Email',191)->unique();; 
+            $table->string('Email', 191)->nullable()->unique(); 
             $table->date('Ngay_Sinh')->nullable();
             $table->string('Mssv')->primary()->unique();
-            $table->string('Lop');
-            $table->string('Khoa');
+            $table->string('Lop')->nullable();
+            $table->string('Khoa')->nullable();
+            $table->string('Bac')->nullable();
             $table->string('Photo')->nullable();
             $table->boolean('KQDD')->default(false);
             $table->timestamps();

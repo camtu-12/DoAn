@@ -37,7 +37,6 @@ class SinhVienController extends Controller
     public function update(Request $request, $id)
     {
         $sv = SinhVien::findOrFail($id);
-
         $data = $request->validate([
             'hovaten' => 'sometimes|string',
             'mssv' => 'sometimes|string|unique:sinhviens,mssv,'.$id,
@@ -135,13 +134,12 @@ public function examSchedule() {
         public function addStudent(Request $request)
         {
             $data = $request->validate([
-                'Ho_va_ten' => 'required|string',
-                'Email' => 'nullable|email',
-                'Ngay_Sinh' => 'nullable|date',
                 'Mssv' => 'required|string|unique:sinhviens,Mssv',
+                'Ho_va_ten' => 'required|string',
+                'Ngay_Sinh' => 'nullable|date',
                 'Lop' => 'nullable|string',
                 'Khoa' => 'nullable|string',
-                'Photo' => 'nullable|string',
+                'Bac' => 'nullable|string',
             ]);
 
             try {
@@ -164,13 +162,12 @@ public function examSchedule() {
             }
 
             $data = $request->validate([
-                'Ho_va_ten' => 'sometimes|string',
-                'Email' => 'sometimes|nullable|email',
-                'Ngay_Sinh' => 'sometimes|nullable|date',
                 'Mssv' => 'sometimes|string|unique:sinhviens,Mssv,'.$id.',Mssv',
+                'Ho_va_ten' => 'sometimes|string',
+                'Ngay_Sinh' => 'sometimes|nullable|date',
                 'Lop' => 'sometimes|nullable|string',
                 'Khoa' => 'sometimes|nullable|string',
-                'Photo' => 'sometimes|nullable|string',
+                'Bac' => 'sometimes|nullable|string',
             ]);
 
             try {
@@ -178,6 +175,19 @@ public function examSchedule() {
                 return response()->json($sv, 200);
             } catch (\Exception $e) {
                 return response()->json(['message' => 'Cập nhật thất bại', 'error' => $e->getMessage()], 500);
+            }
+        }
+
+        /**
+         * Xóa tất cả sinh viên khỏi database
+         */
+        public function deleteAllStudents()
+        {
+            try {
+                SinhVien::truncate();
+                return response()->json(['message' => 'Đã xóa tất cả sinh viên'], 200);
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Xóa thất bại', 'error' => $e->getMessage()], 500);
             }
         }
 
