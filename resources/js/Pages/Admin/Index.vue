@@ -197,7 +197,7 @@
                   <td>{{ formatDate(s.Ngay_Sinh) }}</td>
                   <td>{{ s.Lop }}</td>
                   <td>{{ s.Khoa }}</td>
-                  <td>{{ s.Bac || 'Chưa có' }}</td>
+                  <td>{{ s.Bac || s.bac || s.BAC || 'Chưa có' }}</td>
                   <td class="actions-cell">
                     <button @click="openStudentForm(s, i)">Sửa</button>
                     <button @click="deleteStudent(i)">Xóa</button>
@@ -365,12 +365,15 @@
             </div>
             <div class="form-row">
               <label>Bậc</label>
-              <select v-model="studentForm.Bac">
-                <option value="">Chọn bậc đào tạo</option>
-                <option value="Đại học">Đại học</option>
-                <option value="Cao đẳng">Cao đẳng</option>
-                <option value="Liên thông">Liên thông</option>
-              </select>
+              <input 
+                v-model.trim="studentForm.Bac" 
+                placeholder="Nhập bậc đào tạo" 
+                @input="console.log('Bậc value changed:', studentForm.Bac)"
+                @change="console.log('Bậc final value:', studentForm.Bac)"
+                class="form-control"
+                type="text"
+                required
+              />
             </div>
             <div class="form-row actions">
               <button @click="saveStudent">Lưu</button>
@@ -541,13 +544,19 @@ const fetchLecturers = async () => {
 const fetchStudents = async () => {
   try {
     const res = await axios.get('/students')
-    console.log('Fetched students data:', res.data); 
+    console.log('Raw response from /students:', res); // Debug full response
+    console.log('Fetched students data:', res.data);
+
     if (Array.isArray(res.data)) {
-      // Kiểm tra và đảm bảo mỗi sinh viên có trường Bac
-      students.value = res.data.map(student => ({
-        ...student,
-        Bac: student.Bac || student.bac || '' // Thử cả 2 cách viết hoa/thường
-      }));
+      // Map và log từng sinh viên để debug
+      students.value = res.data.map(student => {
+        const mappedStudent = {
+          ...student,
+          Bac: student.Bac || student.bac || student.BAC || null // Thử nhiều cách viết
+        };
+        console.log('Mapped student:', mappedStudent); // Debug each student
+        return mappedStudent;
+      });
     } else {
       console.error('Data from server is not an array:', res.data);
       students.value = [];
@@ -684,7 +693,14 @@ async function deleteLecturer(id){
 // MODALS & FORM - Sinh viên
 // =============================
 const showStudentModal = ref(false)
-const studentForm = reactive({ Mssv:'', Ho_va_ten:'', Ngay_Sinh:'', Lop:'', Khoa:'', Bac:'' })
+const studentForm = reactive({
+  Mssv: '',
+  Ho_va_ten: '',
+  Ngay_Sinh: '',
+  Lop: '',
+  Khoa: '',
+  Bac: ''
+})
 const studentEditingIndex = ref(null)
 
 
@@ -727,42 +743,102 @@ function onStudentPhoto(e){
 }
 async function saveStudent(){
   try {
-    // Validate bậc học
+    // Validate các trường bắt buộc
+    if (!studentForm.Mssv) {
+      alert('❌ Vui lòng nhập MSSV');
+      return;
+    }
+    if (!studentForm.Ho_va_ten) {
+      alert('❌ Vui lòng nhập Họ và tên');
+      return;
+    }
     if (!studentForm.Bac) {
-      alert('❌ Vui lòng chọn bậc đào tạo');
+      alert('❌ Vui lòng nhập Bậc đào tạo');
       return;
     }
 
+    // Kiểm tra và log giá trị form trước khi gửi
+    console.log('Current form values:', studentForm);
+    
+    // Chuẩn bị dữ liệu gửi lên server
+    // Kiểm tra và format dữ liệu trước khi gửi
+    const bac = studentForm.Bac.trim(); // Loại bỏ khoảng trắng thừa
+    console.log('Giá trị bậc trước khi gửi:', bac);
+
     const studentData = {
+      Mssv: studentForm.Mssv,
+      Ho_va_ten: studentForm.Ho_va_ten,
+      Ngay_Sinh: studentForm.Ngay_Sinh || '',
+      Lop: studentForm.Lop || '',
+      Khoa: studentForm.Khoa || '',
+      Bac: bac // Gửi giá trị bậc đã được xử lý
+    };
+    
+    // Log dữ liệu trước khi gửi
+    console.log('Data to be sent:', studentData);
+
+    console.log('Form data being sent:', {
       Mssv: studentForm.Mssv,
       Ho_va_ten: studentForm.Ho_va_ten,
       Ngay_Sinh: studentForm.Ngay_Sinh,
       Lop: studentForm.Lop,
       Khoa: studentForm.Khoa,
       Bac: studentForm.Bac
-    };
+    });
 
-    console.log('Saving student data:', studentData); // Debug log
-
+    let response;
     if (studentEditingIndex.value === null) {
       // Thêm mới sinh viên
-      const response = await axios.post('/students/add', studentData);
-      console.log('Add response:', response.data); // Debug log
-      alert('✅ Thêm sinh viên thành công!');
+      console.log('Sending data for new student:', studentData);
+      response = await axios.post('/students/add', studentData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('Add response:', response.data);
     } else {
       // Cập nhật sinh viên
-      const s = students.value[studentEditingIndex.value];
-      if (!s) return alert('Không tìm thấy sinh viên để cập nhật');
-      const response = await axios.put(`/students/update/${studentForm.Mssv}`, studentData);
-      console.log('Update response:', response.data); // Debug log
-      alert('✅ Cập nhật sinh viên thành công!');
+      console.log('Sending data for update:', studentData);
+      response = await axios.put(`/students/update/${studentForm.Mssv}`, studentData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('Update response:', response.data);
     }
-    
-    // Tải lại danh sách sinh viên từ server
-    await fetchStudents();
-    closeStudentForm();
+
+    if (response.data.success) {
+      // Log response từ server
+      console.log('Server response:', response.data);
+
+      // Tạo object mới với dữ liệu đã được xác nhận từ form
+      const newStudentData = {
+        Mssv: studentForm.Mssv,
+        Ho_va_ten: studentForm.Ho_va_ten,
+        Ngay_Sinh: studentForm.Ngay_Sinh,
+        Lop: studentForm.Lop,
+        Khoa: studentForm.Khoa,
+        Bac: studentForm.Bac // Đảm bảo lưu đúng giá trị bậc
+      };
+
+      // Cập nhật giao diện ngay lập tức
+      if (studentEditingIndex.value === null) {
+        students.value = [...students.value, newStudentData];
+      } else {
+        students.value[studentEditingIndex.value] = newStudentData;
+        students.value = [...students.value]; // Force reactivity update
+      }
+      
+      alert('✅ ' + (studentEditingIndex.value === null ? 'Thêm' : 'Cập nhật') + ' sinh viên thành công!');
+      closeStudentForm();
+      
+      // Tải lại danh sách từ server để đảm bảo đồng bộ
+      await fetchStudents();
+    } else {
+      throw new Error(response.data.message || 'Không thể lưu sinh viên');
+    }
   } catch (err) {
-    console.error('Lỗi khi lưu sinh viên:', err.response?.data || err.message);
+    console.error('Lỗi khi lưu sinh viên:', err);
     alert('❌ Không thể lưu sinh viên: ' + (err.response?.data?.message || err.message));
   }
 }
