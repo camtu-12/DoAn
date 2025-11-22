@@ -7,10 +7,13 @@ import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const form = useForm({
-    name: '',
+    Mssv: '',
+    Ho_va_Ten: '',
     email: '',
     password: '',
     password_confirmation: '',
+    role: 'sinh_vien',
+    lop: '',
 });
 
 const submit = () => {
@@ -26,19 +29,35 @@ const submit = () => {
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="Mssv" value="MSSV" />
 
                 <TextInput
-                    id="name"
+                    id="Mssv"
                     type="text"
                     class="mt-1 block w-full"
-                    v-model="form.name"
+                    v-model="form.Mssv"
                     required
                     autofocus
+                    autocomplete="username"
+                    placeholder="Ví dụ: 2021CNTT001"
+                />
+
+                <InputError class="mt-2" :message="form.errors.Mssv" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="Ho_va_Ten" value="Họ và Tên" />
+
+                <TextInput
+                    id="Ho_va_Ten"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.Ho_va_Ten"
+                    required
                     autocomplete="name"
                 />
 
-                <InputError class="mt-2" :message="form.errors.name" />
+                <InputError class="mt-2" :message="form.errors.Ho_va_Ten" />
             </div>
 
             <div class="mt-4">
@@ -50,14 +69,46 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.email"
                     required
-                    autocomplete="username"
+                    autocomplete="email"
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <InputLabel for="role" value="Vai trò" />
+
+                <select
+                    id="role"
+                    v-model="form.role"
+                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                    required
+                >
+                    <option value="sinh_vien">Sinh viên</option>
+                    <option value="giang_vien">Giảng viên</option>
+                    <option value="admin">Admin</option>
+                </select>
+
+                <InputError class="mt-2" :message="form.errors.role" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="lop" value="Lớp (tùy chọn)" />
+
+                <TextInput
+                    id="lop"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.lop"
+                    autocomplete="off"
+                    placeholder="Ví dụ: CNTT01"
+                />
+
+                <InputError class="mt-2" :message="form.errors.lop" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="password" value="Mật khẩu" />
 
                 <TextInput
                     id="password"
@@ -74,7 +125,7 @@ const submit = () => {
             <div class="mt-4">
                 <InputLabel
                     for="password_confirmation"
-                    value="Confirm Password"
+                    value="Xác nhận mật khẩu"
                 />
 
                 <TextInput
@@ -97,7 +148,7 @@ const submit = () => {
                     :href="route('login')"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                    Already registered?
+                    Đã có tài khoản?
                 </Link>
 
                 <PrimaryButton
@@ -105,7 +156,7 @@ const submit = () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Register
+                    Đăng ký
                 </PrimaryButton>
             </div>
         </form>
