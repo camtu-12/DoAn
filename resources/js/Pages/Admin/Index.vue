@@ -354,7 +354,11 @@
     </div>
 
     <div class="form-row actions">
-      <button @click="saveSchedule" class="bg-blue-500 text-white px-3 py-1 rounded mr-2">Lưu</button>
+      <button @click="saveSchedule" :disabled="isSavingSchedule" 
+              :class="isSavingSchedule ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500'"
+              class="text-white px-3 py-1 rounded mr-2">
+        {{ isSavingSchedule ? 'Đang lưu...' : 'Lưu' }}
+      </button>
       <button @click="closeScheduleForm" class="bg-gray-400 text-white px-3 py-1 rounded">Hủy</button>
     </div>
   </div>
@@ -858,7 +862,12 @@ const fetchSchedules = async () => {
 
 
 async function saveSchedule() {
+  // Prevent double submit
+  if (isSavingSchedule.value) return
+  
   try {
+    isSavingSchedule.value = true // Disable button
+    
     // Xử lý danh sách sinh viên: hỗ trợ dấu phẩy và xuống dòng
     let danhSachSinhVien = '';
     let danhSachSinhVienMSSV = ''; // Để gửi lên server
@@ -944,6 +953,8 @@ async function saveSchedule() {
   } catch (err) {
     console.error('❌ Lỗi khi lưu lịch thi:', err.response?.data || err.message);
     alert('❌ Không thể lưu lịch thi');
+  } finally {
+    isSavingSchedule.value = false // Re-enable button
   }
 }
 
@@ -1204,6 +1215,7 @@ async function deleteStudent(i){
 const showScheduleModal = ref(false)
 const scheduleForm = reactive({ STT : '', Thu: '',  Ngay_Thi: '',   Gio_Bat_Dau: '', Gio_Ket_Thuc: '',    Mon_Hoc: '',  So_Phong: '',  DSSV: '', DSGV: '',  Ghi_Chu: ''})
 const scheduleEditingIndex = ref(null)
+const isSavingSchedule = ref(false) // Loading state để prevent double submit
 
 // Toggle modes cho input sinh viên và giảng viên
 const sinhVienInputMode = ref('mssv') // 'mssv' hoặc 'ten'

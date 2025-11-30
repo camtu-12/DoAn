@@ -114,12 +114,34 @@ class LichThiController extends Controller
                     // Tìm giảng viên theo MaGV
                     $giangVien = \App\Models\GiangVien::where('MaGV', $magv)->first();
                     if ($giangVien) {
+                        // Tạo phân công với status = 'pending' để giảng viên xác nhận
                         \App\Models\PhanCongGiamThi::create([
                             'exam_id' => $schedule->id,
                             'teacher_id' => $giangVien->id,
                             'phong_thi_id' => $validated['So_Phong'] ?? 1,
                             'role' => $index === 0 ? 'Trưởng phòng' : 'Giám thị',
+                            'status' => 'pending', // Chờ giảng viên xác nhận
                         ]);
+
+                        // Tạo tài khoản user cho giảng viên nếu chưa có
+                        try {
+                            $existingUser = \App\Models\User::where('email', $giangVien->Email)
+                                ->orWhere('Mssv', $giangVien->MaGV)
+                                ->first();
+                            
+                            if (!$existingUser && $giangVien->Email) {
+                                \App\Models\User::create([
+                                    'Mssv' => $giangVien->MaGV,
+                                    'Ho_va_Ten' => $giangVien->Ho_va_Ten,
+                                    'email' => $giangVien->Email,
+                                    'password' => \Illuminate\Support\Facades\Hash::make('123456'),
+                                    'role' => 'GiangVien',
+                                ]);
+                            }
+                        } catch (\Exception $e) {
+                            // Bỏ qua lỗi duplicate key - user đã tồn tại
+                            \Log::info("User already exists for teacher: " . $giangVien->MaGV);
+                        }
                     }
                 }
             }
@@ -214,7 +236,28 @@ class LichThiController extends Controller
                             'teacher_id' => $giangVien->id,
                             'phong_thi_id' => $validated['So_Phong'] ?? $schedule->So_Phong,
                             'role' => $index === 0 ? 'Trưởng phòng' : 'Giám thị',
+                            'status' => 'pending', // Chờ giảng viên xác nhận
                         ]);
+
+                        // Tạo tài khoản user cho giảng viên nếu chưa có
+                        try {
+                            $existingUser = \App\Models\User::where('email', $giangVien->Email)
+                                ->orWhere('Mssv', $giangVien->MaGV)
+                                ->first();
+                            
+                            if (!$existingUser && $giangVien->Email) {
+                                \App\Models\User::create([
+                                    'Mssv' => $giangVien->MaGV,
+                                    'Ho_va_Ten' => $giangVien->Ho_va_Ten,
+                                    'email' => $giangVien->Email,
+                                    'password' => \Illuminate\Support\Facades\Hash::make('123456'),
+                                    'role' => 'GiangVien',
+                                ]);
+                            }
+                        } catch (\Exception $e) {
+                            // Bỏ qua lỗi duplicate key - user đã tồn tại
+                            \Log::info("User already exists for teacher: " . $giangVien->MaGV);
+                        }
                     }
                 }
             }

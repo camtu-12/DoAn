@@ -100,19 +100,21 @@ Route::prefix('giangvien')->group(function () {
     Route::post('/doimatkhau', [GiangVienController::class, 'updateMatKhau'])->name('giangvien.updateMatKhau');
 });
 
-Route::middleware('auth:sanctum')->get('/giangvien/thongtin', [GiangVienController::class, 'thongTin']);
-
-Route::middleware('auth')->get('/giangvien/lichgac', [GiangVienController::class, 'lichGac']);
-Route::middleware('auth')->get('/giangvien/ketqua', [GiangVienController::class, 'ketQua']);
-
-
+// API cho giảng viên
 Route::middleware('auth')->group(function () {
-    Route::get('/giangvien/thongtin', [GiangVienController::class, 'thongtin']);
+    Route::get('/giangvien/thongtin', [GiangVienController::class, 'thongTin']);
     Route::get('/giangvien/lichgac', [GiangVienController::class, 'lichGac']);
     Route::get('/giangvien/ketqua', [GiangVienController::class, 'ketQua']);
-});
-Route::middleware('auth')->group(function () {
-    Route::get('/giangvien/lichgac', [GiangVienController::class, 'lichGac']);
+    
+    // Xác nhận/từ chối lịch gác thi
+    Route::post('/giangvien/phan-cong/{id}/confirm', [GiangVienController::class, 'confirmAssignment']);
+    Route::post('/giangvien/phan-cong/{id}/reject', [GiangVienController::class, 'rejectAssignment']);
+    Route::get('/giangvien/phan-cong/pending', [GiangVienController::class, 'getPendingAssignments']);
+    
+    // Điểm danh API
+    Route::get('/giangvien/sinh-vien/{mssv}', [GiangVienController::class, 'getSinhVienByMssv']);
+    Route::post('/giangvien/diem-danh', [GiangVienController::class, 'diemDanh']);
+    Route::get('/giangvien/lich-thi/{id}/sinh-vien', [GiangVienController::class, 'getDanhSachSinhVien']);
 });
 
 

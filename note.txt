@@ -4,6 +4,6 @@
 *- Danh sách sinh viên ở lịch gác phải hiện sv, 
 *- lcih gác, thêm file, tạo form input
 *- implement đổi pass
-- bên user có chức năng assign lịch thi khi admin add vào  khi thêm lịch 
+*- bên user có chức năng assign lịch thi khi admin add vào  khi thêm lịch 
 - đổi colum cập nhật thành điểm danh bên giảng viên, trong đó có 2 model, 1 cái là bằng QR, là mỗi sv có sẵn mã QR,thứ 2 là bằng mssv, sau khi detect đc sv nào thì hiện hết ìnor của sv đó ra, có nút confirrm thì đóng lại, lưu vô danh sách sv , có nút xem ds sv ở cột đó
 - trang ĐIỂM DANH SINH VIÊN ởt giáo viên, hiện ngày gác thi bấm droplist hiện  các sv đã điẻm danh và chưa điểm danh

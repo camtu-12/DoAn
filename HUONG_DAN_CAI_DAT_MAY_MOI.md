@@ -260,9 +260,53 @@ npm run build
 
 ### 2. Khởi động Laravel Development Server
 ```bash
+# Chạy local (chỉ máy này truy cập được)
 php artisan serve
+
+# HOẶC cho phép máy khác truy cập qua mạng/ngrok
+php artisan serve --host=0.0.0.0 --port=8000
 ```
 Dự án sẽ chạy tại: **http://127.0.0.1:8000**
+
+### 2.1. (Tùy chọn) Chia sẻ qua Ngrok
+Nếu muốn chia sẻ dự án cho người khác qua internet:
+
+**Bước 1**: Cài đặt Ngrok
+- Download từ: https://ngrok.com/download
+- Giải nén và copy `ngrok.exe` vào thư mục dự án hoặc thêm vào PATH
+
+**Bước 2**: Chạy Laravel với host 0.0.0.0
+```bash
+php artisan serve --host=0.0.0.0 --port=8000
+```
+
+**Bước 3**: Mở terminal mới, chạy Ngrok
+```bash
+ngrok http 8000
+```
+
+**Bước 4**: Copy URL ngrok (ví dụ: `https://abcd-1234-5678.ngrok-free.app`)
+
+**Bước 5**: Update file `.env`
+```env
+# Thay đổi từ:
+APP_URL=http://localhost
+
+# Thành (thay URL ngrok của bạn):
+APP_URL=https://abcd-1234-5678.ngrok-free.app
+```
+
+**Bước 6**: Clear config cache
+```bash
+php artisan config:clear
+```
+
+**Bước 7**: Chia sẻ URL ngrok cho người khác!
+
+⚠️ **Lưu ý**: 
+- Mỗi lần restart ngrok, URL sẽ thay đổi (bản free)
+- Nhớ đổi lại `APP_URL=http://localhost` khi dùng local
+- Ngrok free có giới hạn 40 connections/phút
 
 ### 3. (Tùy chọn) Chạy Vite Dev Server
 Nếu đang phát triển và muốn hot-reload:

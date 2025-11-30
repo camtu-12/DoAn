@@ -15,8 +15,33 @@ class PhanCongGiamThi extends Model
         'exam_id',
         'teacher_id',
         'phong_thi_id',
-        'role'
+        'role',
+        'status',
+        'confirmed_at'
     ];
+
+    protected $casts = [
+        'confirmed_at' => 'datetime',
+        'status' => 'string'
+    ];
+
+    /**
+     * Scopes để filter theo status
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeConfirmed($query)
+    {
+        return $query->where('status', 'confirmed');
+    }
+
+    public function scopeRejected($query)
+    {
+        return $query->where('status', 'rejected');
+    }
 
     /**
      * Quan hệ với lịch thi
