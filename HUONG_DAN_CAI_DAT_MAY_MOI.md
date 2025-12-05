@@ -75,7 +75,7 @@ composer install --ignore-platform-req=ext-zip
 ### 3. Cài đặt JavaScript Dependencies
 ```bash
 # Cài đặt Node.js packages
-npm installnpm 
+npm install
 ```
 
 ### 4. Cấu hình môi trường

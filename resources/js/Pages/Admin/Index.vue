@@ -49,7 +49,6 @@
             <thead>
               <tr>
                 <th class="border border-gray-300 px-2 py-1">STT</th>
-                <th class="border border-gray-300 px-2 py-1">Thứ</th>
                 <th class="border border-gray-300 px-2 py-1">Ngày thi</th>
                 <th class="border border-gray-300 px-2 py-1">Giờ bắt đầu</th>
                 <th class="border border-gray-300 px-2 py-1">Môn học</th>
@@ -68,7 +67,6 @@
                 class="hover:bg-gray-50"
               >
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ index + 1 }}</td>
-                <td class="border border-gray-300 px-2 py-1 text-center">{{ item.Thu }}</td>
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ formatDate(item.Ngay_Thi) }}</td>
                 <td class="border border-gray-300 px-2 py-1 text-center">{{ item.Gio_Bat_Dau }}</td>
                 <td class="border border-gray-300 px-2 py-1">{{ item.Mon_Hoc }}</td>
@@ -261,19 +259,6 @@
     <div class="form-grid">
 
       <!-- MaMT sẽ được auto-generate ở backend -->
-
-      <div class="form-row">
-        <label>Thứ</label>
-        <select v-model="scheduleForm.Thu">
-          <option value="Thứ 2">Thứ 2</option>
-          <option value="Thứ 3">Thứ 3</option>
-          <option value="Thứ 4">Thứ 4</option>
-          <option value="Thứ 5">Thứ 5</option>
-          <option value="Thứ 6">Thứ 6</option>
-          <option value="Thứ 7">Thứ 7</option>
-          <option value="Chủ nhật">Chủ nhật</option>
-        </select>
-      </div>
 
       <div class="form-row">
         <label>Ngày thi</label>

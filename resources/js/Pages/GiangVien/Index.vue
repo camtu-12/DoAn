@@ -696,13 +696,22 @@ const confirmSchedule = async (id) => {
   if (!confirm('Bạn có chắc chắn muốn xác nhận lịch gác thi này không?')) return
 
   try {
-    const res = await axios.post(`/giangvien/phan-cong/${id}/confirm`)
+    // Get CSRF token
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    console.log('CSRF Token:', token ? 'Found' : 'NOT FOUND');
+    
+    const res = await axios.post(`/giangvien/phan-cong/${id}/confirm`, {}, {
+      headers: {
+        'X-CSRF-TOKEN': token
+      }
+    })
     if (res.data.success) {
       alert('✅ Đã xác nhận lịch gác thi thành công!')
       await fetchSchedules() // Reload danh sách
     }
   } catch (err) {
     console.error('Lỗi khi xác nhận:', err)
+    console.error('Error response:', err.response)
     alert('❌ Không thể xác nhận lịch gác: ' + (err.response?.data?.message || err.message))
   }
 }
